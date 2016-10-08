@@ -17,4 +17,6 @@
     <string name="login">Login</string>
     <string name="sign_up">Sign Up</string>
     <string name="or">Or</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_parent_home">ParentHome</string>
 </resources>
