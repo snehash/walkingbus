@@ -10,6 +10,7 @@
         android:paddingTop="0dp"
         android:layout_margin="0dp">
         <Button
+            android:id="@+id/toSchool"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="To School"
@@ -19,6 +20,7 @@
             android:background="@color/colorPrimaryDark"
             android:textColor="@android:color/white"/>
         <Button
+            android:id="@+id/fromSchool"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="To Home"
@@ -29,6 +31,7 @@
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/childList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
 

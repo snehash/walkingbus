@@ -19,6 +19,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
                 <ImageView
+                    android:id="@+id/pictures"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     android:layout_marginTop="20dp"
@@ -32,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|center_vertical">
                 <TextView
+                    android:id="@id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Filler Name"
@@ -39,6 +41,7 @@
                     android:textSize="20sp"
                     android:textColor="@android:color/black"/>
                 <TextView
+                    android:id="@id/status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Filler status"/>
@@ -52,6 +55,7 @@
             android:gravity="center_horizontal"
             android:weightSum="3">
             <Button
+                android:id="@+id/red"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Leaving"
@@ -64,6 +68,7 @@
                 android:layout_weight="1"
                 android:visibility="visible"/>
             <Button
+                android:id="@+id/green"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Found"
@@ -76,6 +81,7 @@
                 android:layout_weight="1"
                 android:visibility="gone"/>
             <Button
+                android:id="@+id/blue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Picked Up"
