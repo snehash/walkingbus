@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "378160880549",
+    "project_id": "walking-bus"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378160880549:android:64ca5a573e4dd664",
+        "android_client_info": {
+          "package_name": "com.ut.walkingbus.walkingbus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378160880549-q3it6oh9blep656v349uspcl3jik82fr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ut.walkingbus.walkingbus",
+            "certificate_hash": "CAF56B4DED3751836F64006A19A9F734AA47B861"
+          }
+        },
+        {
+          "client_id": "378160880549-ure3og17kchdqt6fb5uhji88i5lulrga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKeRwz4MT2CyEdQJspSKByvo0dKLF8oeo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
