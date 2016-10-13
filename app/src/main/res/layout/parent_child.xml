@@ -35,7 +35,7 @@
                 android:textSize="20sp"
                 android:textColor="@android:color/black"/>
             <TextView
-                android:="@+id/status"
+                android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Filler status"
