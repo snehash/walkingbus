@@ -1,12 +1,7 @@
 package com.ut.walkingbus.walkingbus;
 
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,7 +53,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
         final Child child = childList.get(position);
         holder.name.setText(child.getName());
         holder.status.setText(child.getStatus());
-        holder.picture.setImageURI(child.getPicture());
+        // holder.picture.setImageURI(child.getPicture());
         /*switch(child.getStatus()) {
             case "Not Yet Picked Up":
                 break;
