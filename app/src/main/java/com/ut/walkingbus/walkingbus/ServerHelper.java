@@ -3,6 +3,7 @@ package com.ut.walkingbus.walkingbus;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -25,6 +26,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -36,9 +39,11 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             "378160880549-57b3ckh3mjj3gja4hsqrbanm23pl8gcd.apps.googleusercontent.com";
     private static final String TAG = "ServerHelper";
 
-    GoogleApiClient mGoogleApiClient;
-    GoogleSignInOptions gso;
-    Context mContext;
+    private GoogleApiClient mGoogleApiClient;
+    private GoogleSignInOptions gso;
+    private Context mContext;
+    private String mId;
+    public boolean needToRegister;
 
 
     public ServerHelper(Context context) {
@@ -53,7 +58,19 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 .enableAutoManage((FragmentActivity) mContext, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        SharedPreferences sharedPref = ((Activity) mContext).getPreferences(Context.MODE_PRIVATE);
+        String mId = sharedPref.getString("id", "-1");
 
+        if(mId.equals("-1")) {
+            needToRegister = true;
+        } else {
+            needToRegister = false;
+        }
+
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
     }
 
     public Scope[] requestInitialSignIn() {
@@ -133,6 +150,17 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         });
     }
 
+    public void getParentData() {
+        refreshConnection(new ResultCallback<GoogleSignInResult>() {
+            @Override
+            public void onResult(GoogleSignInResult result) {
+                if (result.isSuccess()) {
+                    new GetInformationTask().execute(result.getSignInAccount().getIdToken());
+                }
+            }
+        });
+    }
+
     private class Register extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -146,10 +174,20 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 HttpResponse response = httpClient.execute(httpPost);
                 final String responseBody = EntityUtils.toString(response.getEntity());
                 Log.i(TAG, "Registered: " + responseBody);
+                JSONObject json = new JSONObject(responseBody);
+                SharedPreferences sharedPref = ((Activity) mContext).getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("id",json.getString("id"));
+                editor.commit();
+                needToRegister = false;
+                mId = json.getString("id");
+                //TODO: use json to get children, name, email
             } catch (ClientProtocolException e) {
                 Log.e(TAG, "Error sending ID token to backend.", e);
             } catch (IOException e) {
                 Log.e(TAG, "Error sending ID token to backend.", e);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
             return null;
@@ -160,29 +198,36 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         Log.d(TAG, "touching");
     }
 
-    /* class for getting child data
-    private class HandleNetworkTask extends AsyncTask<Void, Void, Void> {
-
-
+    //class for getting child data
+    private class GetInformationTask extends AsyncTask<String, Void, Void> {
         @Override
-        protected Void doInBackground(Void... v) {
-
+        protected Void doInBackground(String... param) {
+            String idToken = param[0];
             HttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/parent/1");
-
+            HttpGet httpGet = new HttpGet("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/parent/" + mId);
             try {
-                httpGet.setHeader("Authentication", mId);
+                httpGet.setHeader("Authentication", idToken);
                 HttpResponse response = httpClient.execute(httpGet);
-                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("Have a response " + response);
                 final String responseBody = EntityUtils.toString(response.getEntity());
-                Log.i(TAG, "Signed in as: " + responseBody);
+                JSONObject json = new JSONObject(responseBody);
+                //TODO: Use json to get children, name, email
             } catch (ClientProtocolException e) {
                 Log.e(TAG, "Error sending ID token to backend.", e);
             } catch (IOException e) {
                 Log.e(TAG, "Error sending ID token to backend.", e);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
             return null;
         }
-    } */
+    }
+
+    private class RegisterChildTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            return null;
+        }
+    }
 
 }

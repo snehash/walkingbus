@@ -1,6 +1,8 @@
 package com.ut.walkingbus.walkingbus;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +35,8 @@ public class ParentHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.parent_home_activity);
         Intent intent = getIntent();
+
+        //do UI stuff
         mRecyclerView = (RecyclerView) findViewById(R.id.childList);
         mFromSchoolAdapter = new ParentAdapter(new ArrayList<Child>(), this);
         mToSchoolAdapter = new ParentAdapter(new ArrayList<Child>(), this);
@@ -58,8 +62,17 @@ public class ParentHome extends AppCompatActivity {
                 mRecyclerView.setAdapter(mFromSchoolAdapter);
             }
         });
+
+        //server stuff
         mServerHelper = LoginActivity.getServerHelper();
-        mServerHelper.touch();
+        mServerHelper.setContext(this); //call this line every time to change activities
+
+        //get the id
+        if(mServerHelper.needToRegister) {
+            mServerHelper.register();
+        }
+
+        mServerHelper.getParentData();
     }
 
 
