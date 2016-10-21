@@ -87,28 +87,6 @@ public class ParentActivity extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        JSONObject data = mServerHelper.getParentData();
-
-        ArrayList<Child> children = new ArrayList<Child>();
-        try {
-            JSONArray jsonChildren = data.getJSONArray("children");
-            for(int i = 0; i < jsonChildren.length(); i++) {
-                JSONObject jsonChild = jsonChildren.getJSONObject(i);
-                String id = jsonChild.getString("id");
-                String name = jsonChild.getString("name");
-                String status = jsonChild.getString("status");
-                children.add(new Child(id, name, null, status, null, null));
-            }
-        } catch(Exception e) {}
-
-        mRecyclerView.setAdapter(mChildAdapter);
-
-    }
-
     public static ServerHelper getServerHelper() {
         return mServerHelper;
     }
