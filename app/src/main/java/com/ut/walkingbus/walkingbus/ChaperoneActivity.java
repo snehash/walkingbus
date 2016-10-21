@@ -21,12 +21,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class ChaperoneActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -43,12 +44,16 @@ public class ChaperoneActivity extends AppCompatActivity
      */
     private ViewPager mViewPager;
 
+    private static ServerHelper mServerHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chaperone);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mServerHelper = new ServerHelper(this);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -103,6 +108,10 @@ public class ChaperoneActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    public static ServerHelper getServerHelper() {
+        return mServerHelper;
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -135,20 +144,23 @@ public class ChaperoneActivity extends AppCompatActivity
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
             rv.setHasFixedSize(true);
+            mServerHelper = ChaperoneActivity.getServerHelper();
+            JSONObject data = mServerHelper.getParentData();
 
             ArrayList<Child> childrenToSchool = new ArrayList<Child>();
-            childrenToSchool.add(new Child("Bill York", null, "En route", "1234", "Phil Collins"));
-            childrenToSchool.add(new Child("Sally York", null, "At school", "-1", null));
-            childrenToSchool.add(new Child("Craig York", null, "En route", "4444", "Teresa Famberly"));
-            childrenToSchool.add(new Child("Maria York", null, "LOST", "1111", "Teresa Famberly"));
-            childrenToSchool.add(new Child("Carla York", null, "At home", "-1", null));
-
             ArrayList<Child> childrenFromSchool = new ArrayList<Child>();
-            childrenFromSchool.add(new Child("Bill Yorky", null, "En route", "1234", "Phil Collins"));
-            childrenFromSchool.add(new Child("Sally Yorky", null, "At school", "-1", null));
-            childrenFromSchool.add(new Child("Craig Yorky", null, "En route", "4444", "Teresa Famberly"));
-            childrenFromSchool.add(new Child("Maria Yorky", null, "LOST", "1111", "Teresa Famberly"));
-            childrenFromSchool.add(new Child("Carla Yorky", null, "At home", "-1", null));
+
+            try {
+                JSONArray jsonChildren = data.getJSONArray("children");
+                for(int i = 0; i < jsonChildren.length(); i++) {
+                    JSONObject jsonChild = jsonChildren.getJSONObject(i);
+                    String id = jsonChild.getString("id");
+                    String name = jsonChild.getString("name");
+                    String status = jsonChild.getString("status");
+                    childrenToSchool.add(new Child(id, name, null, status, null, null));
+                }
+            } catch(Exception e) {}
+
 
             if(getArguments().getBoolean(ARG_TO_SCHOOL)) {
                 mChildAdapter = new ChaperoneAdapter(childrenToSchool, this.getContext());
@@ -160,7 +172,6 @@ public class ChaperoneActivity extends AppCompatActivity
 
             LinearLayoutManager llm = new LinearLayoutManager(getActivity());
             rv.setLayoutManager(llm);
-
             return rootView;
         }
     }

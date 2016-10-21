@@ -1,7 +1,6 @@
 package com.ut.walkingbus.walkingbus;
 
 
-import android.media.Image;
 import android.net.Uri;
 
 public class Child {
@@ -10,14 +9,18 @@ public class Child {
     private String mStatus;
     private String mChaperoneNumber;
     private String mChaperoneName;
+    private String mId;
 
-    public Child (String name, Uri picture, String status, String chaperoneNumber, String chaperoneName) {
+    public Child (String id, String name, Uri picture, String status, String chaperoneNumber, String chaperoneName) {
+        mId = id;
         mName = name;
         mPicture = picture;
         mStatus = status;
         mChaperoneNumber = chaperoneNumber;
         mChaperoneName = chaperoneName;
     }
+
+    public void setId(String id) {mId = id;}
 
     public void setName(String name) {
         mName = name;
@@ -38,6 +41,8 @@ public class Child {
     public void setChaperoneName(String name) {
         mChaperoneName = name;
     }
+
+    public String getId() { return mId; }
 
     public String getName() {
         return mName;

@@ -3,6 +3,7 @@ package com.ut.walkingbus.walkingbus;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,6 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
             red = (Button) view.findViewById(R.id.red);
             green = (Button) view.findViewById(R.id.green);
             blue = (Button) view.findViewById(R.id.blue);
-
         }
     }
 
@@ -53,6 +53,23 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
         final Child child = childList.get(position);
         holder.name.setText(child.getName());
         holder.status.setText(child.getStatus());
+
+        holder.blue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                ServerHelper helper = ChaperoneActivity.getServerHelper();
+                Log.d("HEY","Blue pressed");
+                helper.updateChildStatus(child.getId(), "Picked Up");
+            }
+        });
+        holder.red.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                ServerHelper helper = ChaperoneActivity.getServerHelper();
+                Log.d("HEY","Red pressed");
+                helper.updateChildStatus(child.getId(), "LOST");
+            }
+        });
         // holder.picture.setImageURI(child.getPicture());
         /*switch(child.getStatus()) {
             case "Not Yet Picked Up":

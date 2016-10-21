@@ -15,12 +15,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class ParentActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public static final String ID= "ID";
+
     RecyclerView mRecyclerView;
     ParentAdapter mChildAdapter;
+    private static ServerHelper mServerHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +43,20 @@ public class ParentActivity extends AppCompatActivity
             }
         });
 
+        mServerHelper = new ServerHelper(this);
+        JSONObject data = mServerHelper.getParentData();
+
         ArrayList<Child> children = new ArrayList<Child>();
-        children.add(new Child("Bill York", null, "En route", "1234", "Phil Collins"));
-        children.add(new Child("Sally York", null, "At school", "-1", null));
-        children.add(new Child("Craig York", null, "En route", "4444", "Teresa Famberly"));
-        children.add(new Child("Maria York", null, "LOST", "1111", "Teresa Famberly"));
-        children.add(new Child("Carla York", null, "At home", "-1", null));
+        try {
+            JSONArray jsonChildren = data.getJSONArray("children");
+            for(int i = 0; i < jsonChildren.length(); i++) {
+                JSONObject jsonChild = jsonChildren.getJSONObject(i);
+                String id = jsonChild.getString("id");
+                String name = jsonChild.getString("name");
+                String status = jsonChild.getString("status");
+                children.add(new Child(id, name, null, status, null, null));
+            }
+        } catch(Exception e) {}
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -60,6 +75,42 @@ public class ParentActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //server stuff
+        // mServerHelper = LoginActivity.getServerHelper();
+        mServerHelper.setContext(this); //call this line every time to change activities
+
+        //get the id
+        if(mServerHelper.needToRegister) {
+            mServerHelper.register();
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        JSONObject data = mServerHelper.getParentData();
+
+        ArrayList<Child> children = new ArrayList<Child>();
+        try {
+            JSONArray jsonChildren = data.getJSONArray("children");
+            for(int i = 0; i < jsonChildren.length(); i++) {
+                JSONObject jsonChild = jsonChildren.getJSONObject(i);
+                String id = jsonChild.getString("id");
+                String name = jsonChild.getString("name");
+                String status = jsonChild.getString("status");
+                children.add(new Child(id, name, null, status, null, null));
+            }
+        } catch(Exception e) {}
+
+        mRecyclerView.setAdapter(mChildAdapter);
+
+    }
+
+    public static ServerHelper getServerHelper() {
+        return mServerHelper;
     }
 
     @Override

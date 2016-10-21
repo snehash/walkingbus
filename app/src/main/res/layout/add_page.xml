@@ -12,6 +12,7 @@
         android:weightSum="1">
 
         <ImageView
+            android:id="@+id/add_picture_preview"
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_marginTop="20dp"
@@ -19,6 +20,7 @@
             android:layout_marginRight="12dp"
             android:background="@android:color/darker_gray"/>
         <TextView
+            android:id="@+id/add_picture_filename"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -26,6 +28,7 @@
             android:layout_gravity="center_vertical"/>
 
         <Button
+            android:id="@+id/add_picture_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Browse"
@@ -44,6 +47,7 @@
         android:layout_marginTop="20dp"/>
 
     <EditText
+        android:id="@+id/add_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
@@ -70,6 +74,7 @@
         android:backgroundTint="@android:color/background_light"/>
 
     <EditText
+        android:id="@+id/add_info"
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:layout_marginLeft="15dp"
@@ -77,6 +82,7 @@
         android:layout_marginBottom="20dp"/>
 
     <Button
+        android:id="@+id/add_submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
