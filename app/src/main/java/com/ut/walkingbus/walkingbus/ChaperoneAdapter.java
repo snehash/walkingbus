@@ -57,7 +57,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
         holder.blue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                ServerHelper helper = ChaperoneActivity.getServerHelper();
+                ServerHelper helper = LoginActivity.getServerHelper();
                 Log.d("HEY","Blue pressed");
                 helper.updateChildStatus(child.getId(), "Picked Up");
             }
@@ -65,7 +65,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
         holder.red.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                ServerHelper helper = ChaperoneActivity.getServerHelper();
+                ServerHelper helper = LoginActivity.getServerHelper();
                 Log.d("HEY","Red pressed");
                 helper.updateChildStatus(child.getId(), "LOST");
             }

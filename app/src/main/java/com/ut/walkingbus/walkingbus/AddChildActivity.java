@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class AddChildActivity extends AppCompatActivity {
+    private static final String TAG = "AddChildActivity";
 
     private static int RESULT_LOAD_IMAGE = 1;
     private String name;
@@ -50,8 +51,8 @@ public class AddChildActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 String name = ((TextView) findViewById(R.id.add_name)).getText().toString();
 
-                Log.d("HEY", "adding child" + name);
-                ParentActivity.getServerHelper().addChild("IAMADUMMY", name);
+                Log.d(TAG, "adding child" + name);
+                LoginActivity.getServerHelper().addChild(name);
                 AddChildActivity.super.onBackPressed();
             }
         });

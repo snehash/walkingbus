@@ -18,11 +18,6 @@
 
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="Login" />
-        <activity
-            android:name=".ParentActivity"
-            android:label="Parent Home"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,12 +25,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ParentActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ChaperoneActivity"
-            android:label="Chaperone Home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddChildActivity"
-            android:label="Add Child"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity implements
 
     private static ServerHelper mServerHelper;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +85,8 @@ public class LoginActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, ParentActivity.class);
             intent.putExtra(ParentActivity.ID, idToken);
             startActivityForResult(intent, 0);
-
+            Log.d(TAG, "name:" + name);
+            Log.d(TAG, "token:" + idToken);
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);

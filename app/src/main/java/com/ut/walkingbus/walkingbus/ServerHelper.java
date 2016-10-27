@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * Class to manage calls to the server; TODO: change to singleton
  */
 public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
-    private static final String SERVER_ID =
+    private static final String SERVER_CLIENT_ID =
             "378160880549-57b3ckh3mjj3gja4hsqrbanm23pl8gcd.apps.googleusercontent.com";
     private static final String TAG = "ServerHelper";
 
@@ -58,7 +58,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         mContext = context;
         gso = new GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(SERVER_ID)
+                .requestIdToken(SERVER_CLIENT_ID)
                 .requestProfile()
                 .requestEmail()
                 .build();
@@ -159,7 +159,6 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
     }
 
     public JSONObject getParentData() {
-        /*
         refreshConnection(new ResultCallback<GoogleSignInResult>() {
             @Override
             public void onResult(GoogleSignInResult result) {
@@ -168,39 +167,43 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 }
             }
         });
-        */
-        new GetInformationTask().execute("IAMADUMMY");
         while(!dataRetrieved) {}
         return parentData;
     }
 
-    public void addChild(String id, String name) {
-        /*
+    public void addChild(String childName) {
         refreshConnection(new ResultCallback<GoogleSignInResult>() {
+            String childName;
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new GetInformationTask().execute(result.getSignInAccount().getIdToken());
+                    new AddChildTask().execute(result.getSignInAccount().getIdToken(), childName);
                 }
             }
-        });
-        */
-        new AddChildTask().execute(id, name);
+            private ResultCallback<GoogleSignInResult> init(String childName) {
+                this.childName = childName;
+                return this;
+            }
+        }.init(childName));
     }
 
 
-    public void updateChildStatus(String id, String status) {
-        /*
+    public void updateChildStatus(String childId, String childStatus) {
         refreshConnection(new ResultCallback<GoogleSignInResult>() {
+            String childId;
+            String childStatus;
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new GetInformationTask().execute(result.getSignInAccount().getIdToken());
+                    new UpdateChildStatusTask().execute(result.getSignInAccount().getIdToken(), childId, childStatus);
                 }
             }
-        });
-        */
-        new UpdateChildStatusTask().execute("IAMADUMMY", id, status);
+            private ResultCallback<GoogleSignInResult> init(String childId, String childStatus) {
+                this.childId = childId;
+                this.childStatus = childStatus;
+                return this;
+            }
+        }.init(childId, childStatus));
     }
 
     private class Register extends AsyncTask<String, Void, Void> {
@@ -212,6 +215,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             HttpPost httpPost = new HttpPost("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/register/");
 
             try {
+                Log.i(TAG, "token: " + idToken);
                 httpPost.setHeader("Authentication", idToken);
                 HttpResponse response = httpClient.execute(httpPost);
                 final String responseBody = EntityUtils.toString(response.getEntity());
@@ -223,6 +227,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 editor.commit();
                 needToRegister = false;
                 mId = json.getString("id");
+                Log.d(TAG, "id:" + mId);
                 //TODO: use json to get children, name, email
             } catch (ClientProtocolException e) {
                 Log.e(TAG, "Error sending ID token to backend.", e);
@@ -246,17 +251,13 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         protected Void doInBackground(String... param) {
             String idToken = param[0];
             HttpClient httpClient = new DefaultHttpClient();
-            // HttpGet httpGet = new HttpGet("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/parent/" + mId);
-            HttpGet httpGet = new HttpGet("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/parent/" + 1);
+            HttpGet httpGet = new HttpGet("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/parent/" + mId);
 
             try {
-                // httpGet.setHeader("Authentication", idToken);
-
                 httpGet.setHeader("Authentication", idToken);
-
                 HttpResponse response = httpClient.execute(httpGet);
-                System.out.println("Have a response " + response);
                 final String responseBody = EntityUtils.toString(response.getEntity());
+                Log.d(TAG, responseBody);
                 //TODO: Use json to get children, name, email
                 parentData = new JSONObject(responseBody);
                 dataRetrieved = true;
@@ -286,7 +287,6 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 params.add(new BasicNameValuePair("name", name));
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
                 HttpResponse response = httpClient.execute(httpPost);
-                System.out.println("Have a response " + response);
                 final String responseBody = EntityUtils.toString(response.getEntity());
             } catch (ClientProtocolException e) {
                 Log.e(TAG, "Error sending ID token to backend.", e);
@@ -305,7 +305,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             String status = param[2];
             ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
             HttpClient httpClient = new DefaultHttpClient();
-            Log.d("HEY", "Child: " + childId + "Status: " + status);
+            Log.d(TAG, "Child: " + childId + "Status: " + status);
             HttpPatch patch = new HttpPatch("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/child/" + childId);
             try {
                 params.add(new BasicNameValuePair("status", status));

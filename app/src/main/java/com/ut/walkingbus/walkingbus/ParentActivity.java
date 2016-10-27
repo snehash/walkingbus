@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +24,11 @@ import java.util.ArrayList;
 public class ParentActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String ID= "ID";
+    private static final String TAG = "ParentActivity";
 
     RecyclerView mRecyclerView;
     ParentAdapter mChildAdapter;
-    private static ServerHelper mServerHelper;
+    ServerHelper mServerHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,8 @@ public class ParentActivity extends AppCompatActivity
             }
         });
 
-        mServerHelper = new ServerHelper(this);
+        mServerHelper = LoginActivity.getServerHelper();
+        mServerHelper.setContext(this);
         JSONObject data = mServerHelper.getParentData();
 
         ArrayList<Child> children = new ArrayList<Child>();
@@ -56,7 +59,11 @@ public class ParentActivity extends AppCompatActivity
                 String status = jsonChild.getString("status");
                 children.add(new Child(id, name, null, status, null, null));
             }
-        } catch(Exception e) {}
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, "children should be added");
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -78,17 +85,12 @@ public class ParentActivity extends AppCompatActivity
 
         //server stuff
         // mServerHelper = LoginActivity.getServerHelper();
-        mServerHelper.setContext(this); //call this line every time to change activities
 
         //get the id
         if(mServerHelper.needToRegister) {
             mServerHelper.register();
         }
 
-    }
-
-    public static ServerHelper getServerHelper() {
-        return mServerHelper;
     }
 
     @Override
@@ -133,7 +135,10 @@ public class ParentActivity extends AppCompatActivity
         } else if (id == R.id.nav_chaperone) {
             Intent intent = new Intent(this, ChaperoneActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_create_group) {
+        } else if(id == R.id.nav_sign_out) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_create_group) {
 
         } else if (id == R.id.nav_group_a) {
 

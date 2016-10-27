@@ -13,12 +13,24 @@
       },
       "oauth_client": [
         {
+          "client_id": "378160880549-m1ue0av70p8k2inu3uhilkgqsafohvck.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ut.walkingbus.walkingbus",
+            "certificate_hash": "248C9F85E6F10E20E87703BFBCDEC45B977DADCA"
+          }
+        },
+        {
           "client_id": "378160880549-q3it6oh9blep656v349uspcl3jik82fr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ut.walkingbus.walkingbus",
             "certificate_hash": "CAF56B4DED3751836F64006A19A9F734AA47B861"
           }
+        },
+        {
+          "client_id": "378160880549-57b3ckh3mjj3gja4hsqrbanm23pl8gcd.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "378160880549-ure3og17kchdqt6fb5uhji88i5lulrga.apps.googleusercontent.com",

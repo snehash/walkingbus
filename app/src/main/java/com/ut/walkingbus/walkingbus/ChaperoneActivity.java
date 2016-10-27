@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,9 +26,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ChaperoneActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "ChaperoneActivity";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -44,7 +47,7 @@ public class ChaperoneActivity extends AppCompatActivity
      */
     private ViewPager mViewPager;
 
-    private static ServerHelper mServerHelper;
+    ServerHelper mServerHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +56,8 @@ public class ChaperoneActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mServerHelper = new ServerHelper(this);
+        mServerHelper = LoginActivity.getServerHelper();
+        mServerHelper.setContext(this);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -108,10 +112,6 @@ public class ChaperoneActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public static ServerHelper getServerHelper() {
-        return mServerHelper;
-    }
-
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -144,20 +144,51 @@ public class ChaperoneActivity extends AppCompatActivity
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
             rv.setHasFixedSize(true);
-            mServerHelper = ChaperoneActivity.getServerHelper();
-            JSONObject data = mServerHelper.getParentData();
+            LoginActivity.getServerHelper().setContext(this.getContext());
+            JSONObject data = LoginActivity.getServerHelper().getParentData();
 
             ArrayList<Child> childrenToSchool = new ArrayList<Child>();
             ArrayList<Child> childrenFromSchool = new ArrayList<Child>();
 
+            // int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+
+            int currentDay = Calendar.MONDAY;
+
             try {
-                JSONArray jsonChildren = data.getJSONArray("children");
-                for(int i = 0; i < jsonChildren.length(); i++) {
-                    JSONObject jsonChild = jsonChildren.getJSONObject(i);
-                    String id = jsonChild.getString("id");
-                    String name = jsonChild.getString("name");
-                    String status = jsonChild.getString("status");
-                    childrenToSchool.add(new Child(id, name, null, status, null, null));
+                JSONArray jsonGroups = data.getJSONArray("groups");
+                for(int i = 0; i < jsonGroups.length(); i++) {
+                    JSONObject jsonGroup = jsonGroups.getJSONObject(i);
+                    JSONArray jsonChildren = jsonGroup.getJSONArray("children");
+                    String time = jsonGroup.getString("time");
+                    int day = getDay(time.substring(0, time.indexOf("_")));
+                    Log.d(TAG, "Current Day: " + currentDay + ", Day: " + day);
+
+                    if(day == currentDay) {
+                        String am_or_pm = time.substring(time.indexOf("_") + 1).toUpperCase();
+                        Log.d(TAG, "AM/PM: " +am_or_pm);
+                        switch(am_or_pm) {
+                            case "AM":
+                                for(int j = 0; j < jsonChildren.length(); j++) {
+                                    JSONObject jsonChild = jsonChildren.getJSONObject(j);
+                                    String id = jsonChild.getString("id");
+                                    String name = jsonChild.getString("name");
+                                    String status = jsonChild.getString("status");
+                                    Log.d(TAG, id + " " + name + " " + status);
+                                    childrenToSchool.add(new Child(id, name, null, status, null, null));
+                                }
+                                break;
+                            case "PM":
+                                for(int j = 0; j < jsonChildren.length(); j++) {
+                                    JSONObject jsonChild = jsonChildren.getJSONObject(j);
+                                    String id = jsonChild.getString("id");
+                                    String name = jsonChild.getString("name");
+                                    String status = jsonChild.getString("status");
+                                    Log.d(TAG, id + " " + name + " " + status);
+                                    childrenFromSchool.add(new Child(id, name, null, status, null, null));
+                                }
+                                break;
+                        }
+                    }
                 }
             } catch(Exception e) {}
 
@@ -173,6 +204,24 @@ public class ChaperoneActivity extends AppCompatActivity
             LinearLayoutManager llm = new LinearLayoutManager(getActivity());
             rv.setLayoutManager(llm);
             return rootView;
+        }
+    }
+
+    private static int getDay(String day) {
+        day = day.toUpperCase();
+        switch(day) {
+            case "MONDAY":
+                return Calendar.MONDAY;
+            case "TUESDAY":
+                return Calendar.TUESDAY;
+            case "WEDNESDAY":
+                return Calendar.WEDNESDAY;
+            case "THURSDAY":
+                return Calendar.THURSDAY;
+            case "FRIDAY":
+                return Calendar.FRIDAY;
+            default:
+                return -1;
         }
     }
 
