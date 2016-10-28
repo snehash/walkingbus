@@ -67,7 +67,7 @@ public class ChaperoneActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.chaperone_tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -235,15 +235,10 @@ public class ChaperoneActivity extends AppCompatActivity
             Intent intent = new Intent(this, ParentActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_chaperone) {
-
-        } else if (id == R.id.nav_create_group) {
-
-        } else if (id == R.id.nav_group_a) {
-
-        } else if (id == R.id.nav_group_b) {
-
-        } else if (id == R.id.nav_group_c) {
-
+            this.recreate();
+        } else if (id == R.id.nav_group) {
+            Intent intent = new Intent(this, GroupActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -277,7 +272,6 @@ public class ChaperoneActivity extends AppCompatActivity
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 2;
         }
 

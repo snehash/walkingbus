@@ -132,20 +132,16 @@ public class ParentActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_parent) {
+            this.recreate();
         } else if (id == R.id.nav_chaperone) {
             Intent intent = new Intent(this, ChaperoneActivity.class);
             startActivity(intent);
         } else if(id == R.id.nav_sign_out) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
-        }else if (id == R.id.nav_create_group) {
-
-        } else if (id == R.id.nav_group_a) {
-
-        } else if (id == R.id.nav_group_b) {
-
-        } else if (id == R.id.nav_group_c) {
-
+        }else if (id == R.id.nav_group) {
+            Intent intent = new Intent(this, GroupActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

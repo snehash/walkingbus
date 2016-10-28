@@ -73,5 +73,6 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_login_alt">Sign in</string>
     <string name="title_activity_add_child">AddChildActivity</string>
+    <string name="title_activity_group">GroupActivity</string>
 
 </resources>

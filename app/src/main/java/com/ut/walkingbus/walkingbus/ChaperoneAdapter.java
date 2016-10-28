@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyViewHolder> {
+    private static final String TAG = "ChaperoneAdapter";
 
     private List<Child> childList;
     private Context mContext;
@@ -58,7 +59,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
             @Override
             public void onClick(View arg0) {
                 ServerHelper helper = LoginActivity.getServerHelper();
-                Log.d("HEY","Blue pressed");
+                Log.d(TAG,"Blue pressed");
                 helper.updateChildStatus(child.getId(), "Picked Up");
             }
         });
@@ -66,7 +67,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
             @Override
             public void onClick(View arg0) {
                 ServerHelper helper = LoginActivity.getServerHelper();
-                Log.d("HEY","Red pressed");
+                Log.d(TAG,"Red pressed");
                 helper.updateChildStatus(child.getId(), "LOST");
             }
         });
