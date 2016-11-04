@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class ParentAdapter extends RecyclerView.Adapter<ParentAdapter.MyViewHolder> {
 
     private List<Child> childList;
@@ -59,29 +62,39 @@ public class ParentAdapter extends RecyclerView.Adapter<ParentAdapter.MyViewHold
         holder.status.setText(child.getStatus());
         holder.chaperone_name.setText(child.getChaperoneName());
         holder.picture.setImageURI(child.getPicture());
-        holder.message.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-                smsIntent.setType("vnd.android-dir/mms-sms");
-                smsIntent.putExtra("address", child.getChaperoneNumber());
-                //smsIntent.putExtra("sms_body","Body of Message");
-                mContext.startActivity(smsIntent);
-            }
-        });
 
-        holder.call.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + child.getChaperoneNumber()));
-                callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    return;
+        if(holder.status.getText() != null) {
+
+            holder.message.setVisibility(VISIBLE);
+            holder.call.setVisibility(VISIBLE);
+
+            holder.message.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+                    smsIntent.setType("vnd.android-dir/mms-sms");
+                    smsIntent.putExtra("address", child.getChaperoneNumber());
+                    //smsIntent.putExtra("sms_body","Body of Message");
+                    mContext.startActivity(smsIntent);
                 }
-                mContext.startActivity(callIntent);
-            }
-        });
+            });
+
+            holder.call.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse("tel:" + child.getChaperoneNumber()));
+                    callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    mContext.startActivity(callIntent);
+                }
+            });
+        } else {
+            holder.message.setVisibility(GONE);
+            holder.call.setVisibility(GONE);
+        }
     }
 
     @Override

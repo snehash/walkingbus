@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyViewHolder> {
     private static final String TAG = "ChaperoneAdapter";
 
@@ -60,7 +63,15 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
             public void onClick(View arg0) {
                 ServerHelper helper = LoginActivity.getServerHelper();
                 Log.d(TAG,"Blue pressed");
-                helper.updateChildStatus(child.getId(), "Picked Up");
+                TextView t = (TextView)arg0.findViewById(R.id.blue);
+                if(t.getText().equals("Picked Up")) {
+                    helper.updateChildStatus(child.getId(), "Picked Up");
+                    t.setText("Dropped off");
+                }
+                if(t.getText().equals("Dropped Off")) {
+                    helper.updateChildStatus(child.getId(), "Dropped Off");
+                    t.setText("Picked Up");
+                }
             }
         });
         holder.red.setOnClickListener(new View.OnClickListener() {
@@ -68,15 +79,25 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
             public void onClick(View arg0) {
                 ServerHelper helper = LoginActivity.getServerHelper();
                 Log.d(TAG,"Red pressed");
-                helper.updateChildStatus(child.getId(), "LOST");
+                TextView t = (TextView)arg0.findViewById(R.id.blue);
+                if(t.getText().equals("Leaving")) {
+                    helper.updateChildStatus(child.getId(), "Left");
+                    t.setText("Lost");
+                }
+                arg0.findViewById(R.id.red).setVisibility(GONE);
+                arg0.findViewById(R.id.green).setVisibility(VISIBLE);
             }
         });
-        // holder.picture.setImageURI(child.getPicture());
-        /*switch(child.getStatus()) {
-            case "Not Yet Picked Up":
-                break;
-
-        } */
+        holder.green.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                ServerHelper helper = LoginActivity.getServerHelper();
+                Log.d(TAG,"Green pressed");
+                arg0.findViewById(R.id.green).setVisibility(GONE);
+                arg0.findViewById(R.id.red).setVisibility(VISIBLE);
+                helper.updateChildStatus(child.getId(), "Found");
+            }
+        });
     }
 
     @Override
