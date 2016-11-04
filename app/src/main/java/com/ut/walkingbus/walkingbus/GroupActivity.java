@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -108,6 +109,9 @@ public class GroupActivity extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_group) {
             this.recreate();
+        } else if (id == R.id.nav_create_group) {
+            Intent intent = new Intent(this, AddGroupActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -152,6 +156,7 @@ public class GroupActivity extends AppCompatActivity
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
+            Log.d(TAG, "Creating new instance: " + sectionNumber);
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
@@ -197,7 +202,8 @@ public class GroupActivity extends AppCompatActivity
                 JSONArray jsonTimeslots = jsonGroup.getJSONArray("timeslots");
                 for(int i = 0; i < jsonTimeslots.length(); i++) {
                     JSONObject jsonTimeslot = jsonTimeslots.getJSONObject(i);
-                    String chaperoneName = jsonTimeslot.getString("chaperone_id");
+                    JSONObject jsonChaperone = jsonTimeslot.getJSONObject("chaperone");
+                    String chaperoneName = jsonChaperone.getString("name");
                     String time = jsonTimeslot.getString("time");
                     int day = getDay(time.substring(0, time.indexOf("_")));
                     int groupIndex = 0;
@@ -212,7 +218,7 @@ public class GroupActivity extends AppCompatActivity
 
                     JSONArray children = jsonTimeslot.getJSONArray("children");
                     for(int j = 0; j < children.length(); j++) {
-                        JSONObject jsonChild = children.getJSONObject(i);
+                        JSONObject jsonChild = children.getJSONObject(j);
                         String name = jsonChild.getString("name");
                         String id = jsonChild.getString("id");
                         groupChildren.get(groupIndex).add(new Child(id, name, null, null, null, null));
@@ -227,6 +233,29 @@ public class GroupActivity extends AppCompatActivity
             ArrayList<Child> pmChildren = new ArrayList<Child>();
 
             String timeslot = "";
+
+            Button amAddChild = (Button) rootView.findViewById(R.id.am_add_child);
+            Button pmAddChild = (Button) rootView.findViewById(R.id.pm_add_child);
+
+            amAddChild.setOnClickListener(new View.OnClickListener() {
+                String groupId;
+                String timeslot;
+                @Override
+                public void onClick(View view) {
+                    LoginActivity.getServerHelper().addChildToGroup("1", "1", "2");
+                }
+
+                private View.OnClickListener init(String groupId, String timeslot) {
+                    this.groupId = groupId;
+                    this.timeslot = timeslot;
+                    return this;
+                }
+            }.init(groupId, timeslot + "_PM"));
+
+            Log.d(TAG, "Section Number: " + getArguments().getInt(ARG_SECTION_NUMBER));
+            Log.d(TAG, "Child Group 0: " + groupChildren.get(0).get(0).getName());
+
+            groupChildren.get(8).add(new Child("Placeholder", null, null, null, null, null));
 
             switch(getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
@@ -260,6 +289,7 @@ public class GroupActivity extends AppCompatActivity
             Log.d(TAG, "Timeslot: " + timeslot);
 
             if(amChildren.isEmpty()) {
+                Log.d(TAG, "Adding amChildren listener");
                 // no AM chaperone
                 amChapText.setOnClickListener(new View.OnClickListener() {
                     String groupId;

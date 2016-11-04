@@ -77,6 +77,10 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
 
     }
 
+    public String getId() {
+        return mId;
+    }
+
     public void setContext(Context context) {
         mContext = context;
     }
@@ -191,6 +195,17 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         }.init(childName));
     }
 
+    public void addGroup() {
+        refreshConnection(new ResultCallback<GoogleSignInResult>() {
+            @Override
+            public void onResult(GoogleSignInResult result) {
+                if (result.isSuccess()) {
+                    new AddGroupTask().execute(result.getSignInAccount().getIdToken());
+                }
+            }
+        });
+    }
+
     public void addChaperone(String groupId, String timeslot) {
         Log.d(TAG, "Adding Chaperone: " + groupId + " " + timeslot);
         refreshConnection(new ResultCallback<GoogleSignInResult>() {
@@ -226,6 +241,26 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 return this;
             }
         }.init(childId, childStatus));
+    }
+
+    public void addChildToGroup(String childId, String groupId, String timeslotId) {
+        refreshConnection(new ResultCallback<GoogleSignInResult>() {
+            String childId;
+            String groupId;
+            String timeslotId;
+            @Override
+            public void onResult(GoogleSignInResult result) {
+                if (result.isSuccess()) {
+                    new AddChildToGroupTask().execute(result.getSignInAccount().getIdToken(), childId, groupId, timeslotId);
+                }
+            }
+            private ResultCallback<GoogleSignInResult> init(String childId, String groupId, String timeslotId) {
+                this.childId = childId;
+                this.groupId = groupId;
+                this.timeslotId = timeslotId;
+                return this;
+            }
+        }.init(childId, groupId, timeslotId));
     }
 
     private class Register extends AsyncTask<String, Void, Void> {
@@ -304,11 +339,11 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 
             HttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/group/" + groupId);
+            HttpPost httpPost = new HttpPost("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/group/" + groupId + "/timeslot/");
 
             try {
                 httpPost.setHeader("Authentication", idToken);
-                params.add(new BasicNameValuePair("timeslot", timeslot));
+                params.add(new BasicNameValuePair("time", timeslot));
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
                 HttpResponse response = httpClient.execute(httpPost);
                 final String responseBody = EntityUtils.toString(response.getEntity());
@@ -334,6 +369,55 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             try {
                 httpPost.setHeader("Authentication", idToken);
                 params.add(new BasicNameValuePair("name", name));
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
+                HttpResponse response = httpClient.execute(httpPost);
+                final String responseBody = EntityUtils.toString(response.getEntity());
+            } catch (ClientProtocolException e) {
+                Log.e(TAG, "Error sending ID token to backend.", e);
+            } catch (IOException e) {
+                Log.e(TAG, "Error sending ID token to backend.", e);
+            }
+            return null;
+        }
+    }
+
+    private class AddGroupTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... param) {
+            String idToken = param[0];
+            ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/group/");
+
+            try {
+                httpPost.setHeader("Authentication", idToken);
+                HttpResponse response = httpClient.execute(httpPost);
+                final String responseBody = EntityUtils.toString(response.getEntity());
+            } catch (ClientProtocolException e) {
+                Log.e(TAG, "Error sending ID token to backend.", e);
+            } catch (IOException e) {
+                Log.e(TAG, "Error sending ID token to backend.", e);
+            }
+            return null;
+        }
+    }
+
+    private class AddChildToGroupTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... param) {
+            String idToken = param[0];
+            String childId = param[1];
+            String groupId = param[2];
+            String timeslotId = param[3];
+            ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/timeslot/" + timeslotId + "/children/");
+
+            try {
+                httpPost.setHeader("Authentication", idToken);
+                params.add(new BasicNameValuePair("child_id", childId));
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
                 HttpResponse response = httpClient.execute(httpPost);
                 final String responseBody = EntityUtils.toString(response.getEntity());

@@ -2,83 +2,42 @@ package com.ut.walkingbus.walkingbus;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+public class AddGroupActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
+    private static final String TAG = "AddGroupActivity";
 
-import java.util.ArrayList;
-
-public class ParentActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-    public static final String ID= "ID";
-    private static final String TAG = "ParentActivity";
-
-    RecyclerView mRecyclerView;
-    ParentAdapter mChildAdapter;
+    private String school;
     ServerHelper mServerHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_parent);
+        setContentView(R.layout.activity_add_group);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        Button submit = (Button) findViewById(R.id.add_submit);
+        submit.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ParentActivity.this, AddChildActivity.class));
+            public void onClick(View arg0) {
+                Log.d(TAG, "adding group");
+                LoginActivity.getServerHelper().addGroup();
+                AddGroupActivity.super.onBackPressed();
             }
         });
-
-        mServerHelper = LoginActivity.getServerHelper();
-        mServerHelper.setContext(this);
-
-        //get the id
-        if(mServerHelper.getNeedToRegister()) {
-            mServerHelper.register();
-        }
-
-        JSONObject data = mServerHelper.getParentData();
-
-        ArrayList<Child> children = new ArrayList<Child>();
-        try {
-            JSONArray jsonChildren = data.getJSONArray("children");
-            for(int i = 0; i < jsonChildren.length(); i++) {
-                JSONObject jsonChild = jsonChildren.getJSONObject(i);
-                String id = jsonChild.getString("id");
-                String name = jsonChild.getString("name");
-                String status = jsonChild.getString("status");
-                children.add(new Child(id, name, null, status, null, null));
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        Log.d(TAG, "children should be added");
-
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.childList);
-        mRecyclerView.setLayoutManager(llm);
-        mChildAdapter = new ParentAdapter(children, this);
-
-        mRecyclerView.setAdapter(mChildAdapter);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -88,10 +47,6 @@ public class ParentActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //server stuff
-        // mServerHelper = LoginActivity.getServerHelper();
-
     }
 
     @Override
@@ -109,21 +64,6 @@ public class ParentActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.actionbar_settings, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -152,4 +92,20 @@ public class ParentActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
