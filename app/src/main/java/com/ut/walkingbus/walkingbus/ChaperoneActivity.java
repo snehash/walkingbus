@@ -152,41 +152,54 @@ public class ChaperoneActivity extends AppCompatActivity
 
             // int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 
-            int currentDay = Calendar.MONDAY;
+            int currentDay = Calendar.TUESDAY;
 
             try {
                 JSONArray jsonGroups = data.getJSONArray("groups");
                 for(int i = 0; i < jsonGroups.length(); i++) {
                     JSONObject jsonGroup = jsonGroups.getJSONObject(i);
-                    JSONArray jsonChildren = jsonGroup.getJSONArray("children");
-                    String time = jsonGroup.getString("time");
-                    int day = getDay(time.substring(0, time.indexOf("_")));
-                    Log.d(TAG, "Current Day: " + currentDay + ", Day: " + day);
+                    JSONArray jsonTimeslots = jsonGroup.getJSONArray("timeslots");
+                    for(int j = 0; j < jsonTimeslots.length(); j++) {
+                        JSONObject jsonTimeslot = jsonTimeslots.getJSONObject(j);
+                        JSONObject jsonChaperone = jsonTimeslot.getJSONObject("chaperone");
+                        String chaperoneId = jsonChaperone.getString("id");
 
-                    if(day == currentDay) {
-                        String am_or_pm = time.substring(time.indexOf("_") + 1).toUpperCase();
-                        Log.d(TAG, "AM/PM: " +am_or_pm);
-                        switch(am_or_pm) {
-                            case "AM":
-                                for(int j = 0; j < jsonChildren.length(); j++) {
-                                    JSONObject jsonChild = jsonChildren.getJSONObject(j);
-                                    String id = jsonChild.getString("id");
-                                    String name = jsonChild.getString("name");
-                                    String status = jsonChild.getString("status");
-                                    Log.d(TAG, id + " " + name + " " + status);
-                                    childrenToSchool.add(new Child(id, name, null, status, null, null));
-                                }
-                                break;
-                            case "PM":
-                                for(int j = 0; j < jsonChildren.length(); j++) {
-                                    JSONObject jsonChild = jsonChildren.getJSONObject(j);
-                                    String id = jsonChild.getString("id");
-                                    String name = jsonChild.getString("name");
-                                    String status = jsonChild.getString("status");
-                                    Log.d(TAG, id + " " + name + " " + status);
-                                    childrenFromSchool.add(new Child(id, name, null, status, null, null));
-                                }
-                                break;
+                        if(!chaperoneId.equals(LoginActivity.getServerHelper().getId())) {
+                            // skip this timeslot if it's not for this chaperone
+                            continue;
+                        }
+
+                        Log.d(TAG, "This is this parent's");
+
+                        JSONArray jsonChildren = jsonTimeslot.getJSONArray("children");
+                        String time = jsonTimeslot.getString("time");
+                        int day = getDay(time.substring(0, time.indexOf("_")));
+                        Log.d(TAG, "Current Day: " + currentDay + ", Day: " + day);
+                        if (day == currentDay) {
+                            String am_or_pm = time.substring(time.indexOf("_") + 1).toUpperCase();
+                            Log.d(TAG, "AM/PM: " + am_or_pm);
+                            switch (am_or_pm) {
+                                case "AM":
+                                    for (int k = 0; k < jsonChildren.length(); k++) {
+                                        JSONObject jsonChild = jsonChildren.getJSONObject(k);
+                                        String id = jsonChild.getString("id");
+                                        String name = jsonChild.getString("name");
+                                        String status = jsonChild.getString("status");
+                                        Log.d(TAG, id + " " + name + " " + status);
+                                        childrenToSchool.add(new Child(id, name, null, status, null, null));
+                                    }
+                                    break;
+                                case "PM":
+                                    for (int k = 0; k < jsonChildren.length(); k++) {
+                                        JSONObject jsonChild = jsonChildren.getJSONObject(k);
+                                        String id = jsonChild.getString("id");
+                                        String name = jsonChild.getString("name");
+                                        String status = jsonChild.getString("status");
+                                        Log.d(TAG, id + " " + name + " " + status);
+                                        childrenFromSchool.add(new Child(id, name, null, status, null, null));
+                                    }
+                                    break;
+                            }
                         }
                     }
                 }
@@ -238,6 +251,9 @@ public class ChaperoneActivity extends AppCompatActivity
             this.recreate();
         } else if (id == R.id.nav_group) {
             Intent intent = new Intent(this, GroupActivity.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_create_group) {
+            Intent intent = new Intent(this, AddGroupActivity.class);
             startActivity(intent);
         }
 
