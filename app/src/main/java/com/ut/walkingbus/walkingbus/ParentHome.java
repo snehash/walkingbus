@@ -61,7 +61,7 @@ public class ParentHome extends AppCompatActivity {
         mServerHelper.setContext(this); //call this line every time to change activities
 
         //get the id
-        if(mServerHelper.needToRegister) {
+        if(mServerHelper.getNeedToRegister()) {
             mServerHelper.register();
         }
 

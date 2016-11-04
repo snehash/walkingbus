@@ -47,7 +47,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
     private GoogleSignInOptions gso;
     private Context mContext;
     private String mId;
-    public boolean needToRegister;
+    private boolean needToRegister;
 
     // Use this to determine if parent data has been successfully received
     private boolean dataRetrieved;
@@ -68,7 +68,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 .build();
         SharedPreferences sharedPref = ((Activity) mContext).getPreferences(Context.MODE_PRIVATE);
         String mId = sharedPref.getString("id", "-1");
-
+        Log.d(TAG, "mId: " + mId);
         if(mId.equals("-1")) {
             needToRegister = true;
         } else {
@@ -79,6 +79,10 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
 
     public void setContext(Context context) {
         mContext = context;
+    }
+
+    public boolean getNeedToRegister() {
+        return needToRegister;
     }
 
     public Scope[] requestInitialSignIn() {
@@ -187,6 +191,24 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         }.init(childName));
     }
 
+    public void addChaperone(String groupId, String timeslot) {
+        Log.d(TAG, "Adding Chaperone: " + groupId + " " + timeslot);
+        refreshConnection(new ResultCallback<GoogleSignInResult>() {
+            String groupId;
+            String timeslot;
+            @Override
+            public void onResult(GoogleSignInResult result) {
+                if (result.isSuccess()) {
+                    new AddChaperoneTask().execute(result.getSignInAccount().getIdToken(), groupId, timeslot);
+                }
+            }
+            private ResultCallback<GoogleSignInResult> init(String groupId, String timeslot) {
+                this.groupId = groupId;
+                this.timeslot = timeslot;
+                return this;
+            }
+        }.init(groupId, timeslot));
+    }
 
     public void updateChildStatus(String childId, String childStatus) {
         refreshConnection(new ResultCallback<GoogleSignInResult>() {
@@ -252,6 +274,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             String idToken = param[0];
             HttpClient httpClient = new DefaultHttpClient();
             HttpGet httpGet = new HttpGet("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/parent/" + mId);
+            Log.d(TAG, "GetInformation mId: " + mId);
 
             try {
                 httpGet.setHeader("Authentication", idToken);
@@ -267,6 +290,32 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 Log.e(TAG, "Error sending ID token to backend.", e);
             } catch (JSONException e) {
                 e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    private class AddChaperoneTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... param) {
+            String idToken = param[0];
+            String groupId = param[1];
+            String timeslot = param[2];
+            ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost("http://ec2-54-244-38-96.us-west-2.compute.amazonaws.com/group/" + groupId);
+
+            try {
+                httpPost.setHeader("Authentication", idToken);
+                params.add(new BasicNameValuePair("timeslot", timeslot));
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
+                HttpResponse response = httpClient.execute(httpPost);
+                final String responseBody = EntityUtils.toString(response.getEntity());
+            } catch (ClientProtocolException e) {
+                Log.e(TAG, "Error sending ID token to backend.", e);
+            } catch (IOException e) {
+                Log.e(TAG, "Error sending ID token to backend.", e);
             }
             return null;
         }

@@ -27,6 +27,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/am_add_child"
+                android:text="Add Child" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,6 +46,12 @@
                 android:id="@+id/pm_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pm_add_child"
+                android:text="Add Child" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

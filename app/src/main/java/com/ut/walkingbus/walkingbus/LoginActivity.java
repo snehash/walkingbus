@@ -79,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, go to ParentHome
             GoogleSignInAccount acct = result.getSignInAccount();
+            String id = acct.getId();
             String name = acct.getDisplayName();
             String email = acct.getEmail();
             String idToken = acct.getIdToken();
@@ -87,6 +88,7 @@ public class LoginActivity extends AppCompatActivity implements
             startActivityForResult(intent, 0);
             Log.d(TAG, "name:" + name);
             Log.d(TAG, "token:" + idToken);
+            Log.d(TAG, "id: " + id);
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);

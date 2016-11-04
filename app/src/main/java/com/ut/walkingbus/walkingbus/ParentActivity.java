@@ -47,6 +47,12 @@ public class ParentActivity extends AppCompatActivity
 
         mServerHelper = LoginActivity.getServerHelper();
         mServerHelper.setContext(this);
+
+        //get the id
+        if(mServerHelper.getNeedToRegister()) {
+            mServerHelper.register();
+        }
+
         JSONObject data = mServerHelper.getParentData();
 
         ArrayList<Child> children = new ArrayList<Child>();
@@ -85,11 +91,6 @@ public class ParentActivity extends AppCompatActivity
 
         //server stuff
         // mServerHelper = LoginActivity.getServerHelper();
-
-        //get the id
-        if(mServerHelper.needToRegister) {
-            mServerHelper.register();
-        }
 
     }
 

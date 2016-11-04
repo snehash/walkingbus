@@ -15,16 +15,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class GroupActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
+
+    private static final String TAG = "GroupActivity";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -157,62 +164,139 @@ public class GroupActivity extends AppCompatActivity
             RecyclerView am = (RecyclerView) rootView.findViewById(R.id.am_group);
             RecyclerView pm = (RecyclerView) rootView.findViewById(R.id.pm_group);
 
+            View amChaperone =  rootView.findViewById(R.id.am_chaperone);
+            View pmChaperone =  rootView.findViewById(R.id.am_chaperone);
+            TextView pmChapText = (TextView) amChaperone.findViewById(R.id.name);
+            TextView amChapText = (TextView) pmChaperone.findViewById(R.id.name);
+
             am.setHasFixedSize(true);
             pm.setHasFixedSize(true);
 
             LoginActivity.getServerHelper().setContext(this.getContext());
+            JSONObject data = LoginActivity.getServerHelper().getParentData();
 
-            ArrayList<Child> childrenMonAm = new ArrayList<Child>();
-            ArrayList<Child> childrenMonPm = new ArrayList<Child>();
+            // goes from Mon AM, Mon PM, Tues AM, etc in order
+            ArrayList<ArrayList<Child>> groupChildren = new ArrayList<ArrayList<Child>>();
+            for(int i = 0; i < 10; i++) {
+                groupChildren.add(new ArrayList<Child>());
+            }
 
-            ArrayList<Child> childrenTuesAm = new ArrayList<Child>();
-            ArrayList<Child> childrenTuesPm = new ArrayList<Child>();
+            // initialize chaperone name for each timeslot
+            ArrayList<String> chaperoneNames = new ArrayList<String>();
+            for(int i = 0; i < 10; i++) {
+                chaperoneNames.add("");
+            }
 
-            ArrayList<Child> childrenWedAm = new ArrayList<Child>();
-            ArrayList<Child> childrenWedPm = new ArrayList<Child>();
+            String groupId = "-1";
 
-            ArrayList<Child> childrenThursAm = new ArrayList<Child>();
-            ArrayList<Child> childrenThursPm = new ArrayList<Child>();
+            try {
+                JSONArray jsonGroups = data.getJSONArray("groups");
+                // just get first group for now, will use dropdown selector later
+                JSONObject jsonGroup = jsonGroups.getJSONObject(0);
+                groupId = jsonGroup.getString("id");
+                JSONArray jsonTimeslots = jsonGroup.getJSONArray("timeslots");
+                for(int i = 0; i < jsonTimeslots.length(); i++) {
+                    JSONObject jsonTimeslot = jsonTimeslots.getJSONObject(i);
+                    String chaperoneName = jsonTimeslot.getString("chaperone_id");
+                    String time = jsonTimeslot.getString("time");
+                    int day = getDay(time.substring(0, time.indexOf("_")));
+                    int groupIndex = 0;
 
-            ArrayList<Child> childrenFriAm = new ArrayList<Child>();
-            ArrayList<Child> childrenFriPm = new ArrayList<Child>();
+                    boolean isPm = time.contains("PM");
+                    if(isPm) {
+                        groupIndex++;
+                    }
+                    groupIndex += day*2;
+                    Log.d(TAG, "Children Array Index: " + groupIndex);
+                    chaperoneNames.set(groupIndex, chaperoneName);
 
-            // Placeholder implementation
-            ArrayList<Child> placeholderChildren = new ArrayList<Child>();
-            childrenMonAm.add(new Child(null, "Samantha", null, null, null, null));
-            childrenMonPm.add(new Child(null, "Timmy", null, null, null, null));
-            childrenTuesAm.add(new Child(null, "Jerry", null, null, null, null));
-            childrenTuesPm.add(new Child(null, "Sally", null, null, null, null));
-            childrenWedAm.add(new Child(null, "Amanda", null, null, null, null));
-            childrenWedPm.add(new Child(null, "George", null, null, null, null));
-            childrenThursAm.add(new Child(null, "Beth", null, null, null, null));
-            childrenThursPm.add(new Child(null, "Franklin", null, null, null, null));
-            childrenFriAm.add(new Child(null, "Harry", null, null, null, null));
-            placeholderChildren.add(new Child(null, "Gerald", null, null, null, null));
-            childrenFriPm.add(new Child(null, "Marie", null, null, null, null));
+                    JSONArray children = jsonTimeslot.getJSONArray("children");
+                    for(int j = 0; j < children.length(); j++) {
+                        JSONObject jsonChild = children.getJSONObject(i);
+                        String name = jsonChild.getString("name");
+                        String id = jsonChild.getString("id");
+                        groupChildren.get(groupIndex).add(new Child(id, name, null, null, null, null));
+
+                    }
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
+            ArrayList<Child> amChildren = new ArrayList<Child>();
+            ArrayList<Child> pmChildren = new ArrayList<Child>();
+
+            String timeslot = "";
 
             switch(getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    amChildAdapter = new GroupAdapter(childrenMonAm, this.getContext());
-                    pmChildAdapter = new GroupAdapter(childrenMonPm, this.getContext());
+                    timeslot = "MONDAY";
+                    amChildren = groupChildren.get(0);
+                    pmChildren = groupChildren.get(1);
                     break;
                 case 2:
-                    amChildAdapter = new GroupAdapter(childrenTuesAm, this.getContext());
-                    pmChildAdapter = new GroupAdapter(childrenTuesPm, this.getContext());
+                    timeslot = "TUESDAY";
+                    amChildren = groupChildren.get(2);
+                    pmChildren = groupChildren.get(3);
                     break;
                 case 3:
-                    amChildAdapter = new GroupAdapter(childrenWedAm, this.getContext());
-                    pmChildAdapter = new GroupAdapter(childrenWedPm, this.getContext());
+                    timeslot = "WEDNESDAY";
+                    amChildren = groupChildren.get(4);
+                    pmChildren = groupChildren.get(5);
                     break;
                 case 4:
-                    amChildAdapter = new GroupAdapter(childrenThursAm, this.getContext());
-                    pmChildAdapter = new GroupAdapter(childrenThursPm, this.getContext());
+                    timeslot = "THURSDAY";
+                    amChildren = groupChildren.get(6);
+                    pmChildren = groupChildren.get(7);
                     break;
                 case 5:
-                    amChildAdapter = new GroupAdapter(childrenFriAm, this.getContext());
-                    pmChildAdapter = new GroupAdapter(childrenFriPm, this.getContext());
+                    timeslot = "FRIDAY";
+                    amChildren = groupChildren.get(8);
+                    pmChildren = groupChildren.get(9);
                     break;
             }
+
+            Log.d(TAG, "Group ID: " + groupId);
+            Log.d(TAG, "Timeslot: " + timeslot);
+
+            if(amChildren.isEmpty()) {
+                // no AM chaperone
+                amChapText.setOnClickListener(new View.OnClickListener() {
+                    String groupId;
+                    String timeslot;
+                    @Override
+                    public void onClick(View view) {
+                        LoginActivity.getServerHelper().addChaperone(groupId, timeslot);
+                    }
+
+                    private View.OnClickListener init(String groupId, String timeslot) {
+                        this.groupId = groupId;
+                        this.timeslot = timeslot;
+                        return this;
+                    }
+                }.init(groupId, timeslot + "_AM"));
+
+            }
+            if(pmChildren.isEmpty()) {
+                // no PM chaperone
+                pmChapText.setOnClickListener(new View.OnClickListener() {
+                    String groupId;
+                    String timeslot;
+                    @Override
+                    public void onClick(View view) {
+                        LoginActivity.getServerHelper().addChaperone(groupId, timeslot);
+                    }
+
+                    private View.OnClickListener init(String groupId, String timeslot) {
+                        this.groupId = groupId;
+                        this.timeslot = timeslot;
+                        return this;
+                    }
+                }.init(groupId, timeslot + "_PM"));
+            }
+
+            amChildAdapter = new GroupAdapter(amChildren, this.getContext());
+            pmChildAdapter = new GroupAdapter(pmChildren, this.getContext());
 
             am.setAdapter(amChildAdapter);
             pm.setAdapter(pmChildAdapter);
@@ -221,6 +305,24 @@ public class GroupActivity extends AppCompatActivity
             am.setLayoutManager(llm);
             pm.setLayoutManager(new LinearLayoutManager(getActivity()));
             return rootView;
+        }
+    }
+
+    private static int getDay(String day) {
+        day = day.toUpperCase();
+        switch(day) {
+            case "MONDAY":
+                return 0;
+            case "TUESDAY":
+                return 1;
+            case "WEDNESDAY":
+                return 2;
+            case "THURSDAY":
+                return 3;
+            case "FRIDAY":
+                return 4;
+            default:
+                return -1;
         }
     }
 
