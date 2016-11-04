@@ -1,5 +1,6 @@
 package com.ut.walkingbus.walkingbus;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -11,6 +12,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,9 +27,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GroupActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -237,49 +241,169 @@ public class GroupActivity extends AppCompatActivity
             Button amAddChild = (Button) rootView.findViewById(R.id.am_add_child);
             Button pmAddChild = (Button) rootView.findViewById(R.id.pm_add_child);
 
+            ArrayList<Child> myChildren = new ArrayList<Child>();
+            try {
+                JSONArray jsonMyChildren = data.getJSONArray("children");
+                for(int i = 0; i < jsonMyChildren.length(); i++) {
+                    JSONObject child = jsonMyChildren.getJSONObject(i);
+                    String id = child.getString("id");
+                    String name = child.getString("name");
+                    myChildren.add(new Child(id, name, null, null, null, null));
+                }
+            } catch(JSONException e) {
+                e.printStackTrace();
+            }
+
             amAddChild.setOnClickListener(new View.OnClickListener() {
                 String groupId;
                 String timeslot;
+                ArrayList<Child> children;
                 @Override
                 public void onClick(View view) {
-                    LoginActivity.getServerHelper().addChildToGroup("1", "1", "2");
+                    // TODO: Retrieve which child to add
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    List<String> childNames = new ArrayList<String>();
+                    ArrayList<String> childIds = new ArrayList<String>();
+                    for(Child c: children) {
+                        childNames.add(c.getName());
+                        childIds.add(c.getId());
+                    }
+                    CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
+                    builder.setTitle("Select Child")
+                            .setItems(cs, new DialogInterface.OnClickListener() {
+                                ArrayList<String> childIds;
+                                String timeslot;
+                                String groupId;
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+                                    String childId = childIds.get(which);
+                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
+                                }
+                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
+                                    this.groupId = groupId;
+                                    this.timeslot = timeslot;
+                                    this.childIds = new ArrayList<String>();
+                                    this.childIds.addAll(childIds);
+                                    return this;
+                                }
+
+                            }.init(groupId, timeslot, childIds));
                 }
 
-                private View.OnClickListener init(String groupId, String timeslot) {
+                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
                     this.groupId = groupId;
                     this.timeslot = timeslot;
+                    this.children = new ArrayList<Child>();
+                    this.children.addAll(children);
                     return this;
                 }
-            }.init(groupId, timeslot + "_PM"));
+            }.init(groupId, timeslot + "_AM", myChildren));
+
+            pmAddChild.setOnClickListener(new View.OnClickListener() {
+                String groupId;
+                String timeslot;
+                ArrayList<Child> children;
+                @Override
+                public void onClick(View view) {
+                    // TODO: Retrieve which child to add
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    List<String> childNames = new ArrayList<String>();
+                    ArrayList<String> childIds = new ArrayList<String>();
+                    for(Child c: children) {
+                        childNames.add(c.getName());
+                        childIds.add(c.getId());
+                    }
+                    CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
+                    builder.setTitle("Select Child")
+                            .setItems(cs, new DialogInterface.OnClickListener() {
+                                ArrayList<String> childIds;
+                                String timeslot;
+                                String groupId;
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+                                    String childId = childIds.get(which);
+                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
+                                }
+                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
+                                    this.groupId = groupId;
+                                    this.timeslot = timeslot;
+                                    this.childIds = new ArrayList<String>();
+                                    this.childIds.addAll(childIds);
+                                    return this;
+                                }
+
+                            }.init(groupId, timeslot, childIds));
+                }
+
+                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
+                    this.groupId = groupId;
+                    this.timeslot = timeslot;
+                    this.children = new ArrayList<Child>();
+                    this.children.addAll(children);
+                    return this;
+                }
+            }.init(groupId, timeslot + "_PM", myChildren));
 
             Log.d(TAG, "Section Number: " + getArguments().getInt(ARG_SECTION_NUMBER));
             Log.d(TAG, "Child Group 0: " + groupChildren.get(0).get(0).getName());
 
-            groupChildren.get(8).add(new Child("Placeholder", null, null, null, null, null));
+            // groupChildren.get(8).add(new Child("Placeholder", null, null, null, null, null));
 
             switch(getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
                     timeslot = "MONDAY";
+                    if(!chaperoneNames.get(0).equals("")) {
+                        amChapText.setText(chaperoneNames.get(0));
+                    }
+                    if(!chaperoneNames.get(1).equals("")) {
+                        pmChapText.setText(chaperoneNames.get(1));
+                    }
                     amChildren = groupChildren.get(0);
                     pmChildren = groupChildren.get(1);
                     break;
                 case 2:
                     timeslot = "TUESDAY";
+                    if(!chaperoneNames.get(2).equals("")) {
+                        amChapText.setText(chaperoneNames.get(2));
+                    }
+                    if(!chaperoneNames.get(3).equals("")) {
+                        pmChapText.setText(chaperoneNames.get(3));
+                    }
                     amChildren = groupChildren.get(2);
                     pmChildren = groupChildren.get(3);
                     break;
                 case 3:
                     timeslot = "WEDNESDAY";
+                    if(!chaperoneNames.get(4).equals("")) {
+                        amChapText.setText(chaperoneNames.get(4));
+                    }
+                    if(!chaperoneNames.get(5).equals("")) {
+                        pmChapText.setText(chaperoneNames.get(5));
+                    }
                     amChildren = groupChildren.get(4);
                     pmChildren = groupChildren.get(5);
                     break;
                 case 4:
                     timeslot = "THURSDAY";
+                    if(!chaperoneNames.get(6).equals("")) {
+                        amChapText.setText(chaperoneNames.get(6));
+                    }
+                    if(!chaperoneNames.get(7).equals("")) {
+                        pmChapText.setText(chaperoneNames.get(7));
+                    }
                     amChildren = groupChildren.get(6);
                     pmChildren = groupChildren.get(7);
                     break;
                 case 5:
                     timeslot = "FRIDAY";
+                    if(!chaperoneNames.get(8).equals("")) {
+                        amChapText.setText(chaperoneNames.get(8));
+                    }
+                    if(!chaperoneNames.get(9).equals("")) {
+                        pmChapText.setText(chaperoneNames.get(9));
+                    }
                     amChildren = groupChildren.get(8);
                     pmChildren = groupChildren.get(9);
                     break;

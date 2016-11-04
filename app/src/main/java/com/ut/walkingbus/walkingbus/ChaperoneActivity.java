@@ -150,9 +150,7 @@ public class ChaperoneActivity extends AppCompatActivity
             ArrayList<Child> childrenToSchool = new ArrayList<Child>();
             ArrayList<Child> childrenFromSchool = new ArrayList<Child>();
 
-            // int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-
-            int currentDay = Calendar.TUESDAY;
+            int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 
             try {
                 JSONArray jsonGroups = data.getJSONArray("groups");
