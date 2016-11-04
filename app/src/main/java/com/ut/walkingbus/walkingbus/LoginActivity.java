@@ -22,14 +22,13 @@ import com.google.android.gms.common.api.ResultCallback;
 public class LoginActivity extends AppCompatActivity implements
         View.OnClickListener {
 
-    private static final String TAG = "SignInActivity";
+    private static final String TAG = "LoginActivity";
     public static final int RC_GET_AUTH_CODE = 9003;
 
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
 
     private static ServerHelper mServerHelper;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +79,16 @@ public class LoginActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, go to ParentHome
             GoogleSignInAccount acct = result.getSignInAccount();
+            String id = acct.getId();
             String name = acct.getDisplayName();
             String email = acct.getEmail();
             String idToken = acct.getIdToken();
-            Intent intent = new Intent(this, ParentHome.class);
-            intent.putExtra(ParentHome.ID, idToken);
+            Intent intent = new Intent(this, ParentActivity.class);
+            intent.putExtra(ParentActivity.ID, idToken);
             startActivityForResult(intent, 0);
-
+            Log.d(TAG, "name:" + name);
+            Log.d(TAG, "token:" + idToken);
+            Log.d(TAG, "id: " + id);
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);

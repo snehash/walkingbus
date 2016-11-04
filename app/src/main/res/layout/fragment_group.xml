@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AM"/>
+
+            <include layout="@layout/group_chaperone"
+                android:id="@+id/am_chaperone"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/am_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/am_add_child"
+                android:text="Add Child" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="PM"/>
+
+            <include layout="@layout/group_chaperone"
+                android:id="@+id/pm_chaperone"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/pm_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pm_add_child"
+                android:text="Add Child" />
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

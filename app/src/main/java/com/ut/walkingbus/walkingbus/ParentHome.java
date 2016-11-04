@@ -1,17 +1,10 @@
 package com.ut.walkingbus.walkingbus;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -68,7 +61,7 @@ public class ParentHome extends AppCompatActivity {
         mServerHelper.setContext(this); //call this line every time to change activities
 
         //get the id
-        if(mServerHelper.needToRegister) {
+        if(mServerHelper.getNeedToRegister()) {
             mServerHelper.register();
         }
 
