@@ -13,6 +13,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "378160880549-d49di2n33iniounpcu4ncb8dbjrknjmv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ut.walkingbus.walkingbus",
+            "certificate_hash": "E9406265DAE943ACD1886277B2D7D9AEE9EDCAE9"
+          }
+        },
+        {
           "client_id": "378160880549-m1ue0av70p8k2inu3uhilkgqsafohvck.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
