@@ -251,6 +251,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
+                    Log.d(TAG, "Adding child " + childId + " to group " + groupId + " for timeslot " + timeslotId);
                     new AddChildToGroupTask().execute(result.getSignInAccount().getIdToken(), childId, groupId, timeslotId);
                 }
             }

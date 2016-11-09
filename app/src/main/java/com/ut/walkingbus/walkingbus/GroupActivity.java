@@ -339,6 +339,7 @@ public class GroupActivity extends AppCompatActivity
                                     // The 'which' argument contains the index position
                                     // of the selected item
                                     String childId = childIds.get(which);
+                                    Log.d(TAG, "Add Child ID: " + childId);
                                     LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
                                 }
                                 private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
@@ -350,7 +351,8 @@ public class GroupActivity extends AppCompatActivity
                                 }
 
                             }.init(groupId, timeslot, childIds));
-                    builder.create();
+                    AlertDialog addChildDialog = builder.create();
+                    addChildDialog.show();
                 }
 
                 private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
@@ -387,8 +389,9 @@ public class GroupActivity extends AppCompatActivity
                                 public void onClick(DialogInterface dialog, int which) {
                                     // The 'which' argument contains the index position
                                     // of the selected item
-                                    Log.d(TAG, "Builder onclick AM");
+                                    Log.d(TAG, "Builder onclick PM");
                                     String childId = childIds.get(which);
+                                    Log.d(TAG, "Add Child ID: " + childId);
                                     LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
                                 }
                                 private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
@@ -400,7 +403,9 @@ public class GroupActivity extends AppCompatActivity
                                 }
 
                             }.init(groupId, timeslot, childIds));
-                    builder.create();
+                    AlertDialog addChildDialog = builder.create();
+                    addChildDialog.show();
+
                 }
 
                 private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
