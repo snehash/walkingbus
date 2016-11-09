@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class ParentAdapter extends RecyclerView.Adapter<ParentAdapter.MyViewHolder> {
+    private static final String TAG = "ParentAdapter";
 
     private List<Child> childList;
     private Context mContext;
@@ -62,8 +64,10 @@ public class ParentAdapter extends RecyclerView.Adapter<ParentAdapter.MyViewHold
         holder.status.setText(child.getStatus());
         holder.chaperone_name.setText(child.getChaperoneName());
         holder.picture.setImageURI(child.getPicture());
+        String status = child.getStatus();
+        Log.d(TAG, "Status: " + status);
 
-        if(holder.status.getText() != null) {
+        if(status.equals(mContext.getString(R.string.status_picked_up))) {
 
             holder.message.setVisibility(VISIBLE);
             holder.call.setVisibility(VISIBLE);

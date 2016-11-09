@@ -144,8 +144,7 @@ public class ParentActivity extends AppCompatActivity
             Intent intent = new Intent(this, GroupActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_create_group) {
-            Intent intent = new Intent(this, AddGroupActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(ParentActivity.this, AddGroupActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -10,7 +10,7 @@ public class Child {
     private String mChaperoneNumber;
     private String mChaperoneName;
     private String mId;
-
+    // TODO: Make status based on R.string.status_x ids instead?
     public Child (String id, String name, Uri picture, String status, String chaperoneNumber, String chaperoneName) {
         mId = id;
         mName = name;

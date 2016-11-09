@@ -75,4 +75,11 @@
     <string name="title_activity_add_child">AddChildActivity</string>
     <string name="title_activity_group">GroupActivity</string>
 
+    <string name ="status_left">Left</string>
+    <string name ="status_picked_up">Picked Up</string>
+    <string name ="status_dropped_off">Dropped Off</string>
+    <string name ="status_lost">Lost</string>
+    <string name ="status_unknown">Unknown</string>
+    <string name ="status_waiting">Waiting</string>
+
 </resources>

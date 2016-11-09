@@ -2,6 +2,7 @@ package com.ut.walkingbus.walkingbus;
 
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,16 +26,15 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView name, status;
         public ImageView picture;
-        private Button red, green, blue;
+        private Button alert, action;
 
         public MyViewHolder(View view) {
             super(view);
             name = (TextView) view.findViewById(R.id.name);
             status = (TextView) view.findViewById(R.id.status);
             picture = (ImageView) view.findViewById(R.id.child_image);
-            red = (Button) view.findViewById(R.id.red);
-            green = (Button) view.findViewById(R.id.green);
-            blue = (Button) view.findViewById(R.id.blue);
+            alert = (Button) view.findViewById(R.id.alert_button);
+            action = (Button) view.findViewById(R.id.action_button);
         }
     }
 
@@ -57,45 +57,131 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
         final Child child = childList.get(position);
         holder.name.setText(child.getName());
         holder.status.setText(child.getStatus());
+        // TODO: what do we show to the chaperone in scenarios where they shouldn't interact
 
-        holder.blue.setOnClickListener(new View.OnClickListener() {
+        final TextView statusView = holder.status;
+        final Button action = holder.action;
+        final Button alert = holder.alert;
+
+        String childStatus = child.getStatus();
+        if(childStatus.equals(mContext.getString(R.string.status_waiting))) {
+            action.setVisibility(VISIBLE);
+            alert.setVisibility(VISIBLE);
+
+            alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+            action.setBackgroundColor(ContextCompat.getColor(mContext, R.color.blue));
+
+            action.setText("Picked Up");
+            alert.setText("Leaving");
+        } else
+        if(childStatus.equals(mContext.getString(R.string.status_lost))) {
+            alert.setVisibility(VISIBLE);
+            action.setVisibility(GONE);
+
+            alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.green));
+
+            alert.setText("Found");
+        } else
+        if(childStatus.equals(mContext.getString(R.string.status_picked_up))) {
+            action.setVisibility(VISIBLE);
+            alert.setVisibility(VISIBLE);
+
+            alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+            action.setBackgroundColor(ContextCompat.getColor(mContext, R.color.blue));
+
+            action.setText("Picked Up");
+            alert.setText("Leaving");
+        } else
+        if(childStatus.equals(mContext.getString(R.string.status_dropped_off))) {
+            action.setVisibility(GONE);
+            alert.setVisibility(GONE);
+        } else
+        if(childStatus.equals(mContext.getString(R.string.status_left))) {
+            action.setVisibility(VISIBLE);
+            alert.setVisibility(GONE);
+
+            action.setBackgroundColor(ContextCompat.getColor(mContext, R.color.blue));
+
+            action.setText("Picked Up");
+        } else {
+            Log.d(TAG, "Unknown status");
+        }
+
+        action.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 ServerHelper helper = LoginActivity.getServerHelper();
-                Log.d(TAG,"Blue pressed");
-                TextView t = (TextView)arg0.findViewById(R.id.blue);
-                if(t.getText().equals("Picked Up")) {
-                    helper.updateChildStatus(child.getId(), "Picked Up");
-                    t.setText("Dropped off");
+                Log.d(TAG,"Action pressed");
+                Button action = (Button)arg0.findViewById(R.id.action_button);
+                Context c = arg0.getContext();
+                String status = child.getStatus();
+                Log.d(TAG, "Status: " + status);
+
+                // TODO: server transition from dropped off into waiting automatically
+
+                // hit action while child is picked up -> child is dropped off
+                if(status.equals(c.getString(R.string.status_picked_up))) {
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_dropped_off));
+                    child.setStatus(c.getString(R.string.status_dropped_off));
+                    // action.setVisibility(GONE);
+                    action.setText("Dropped Off");
+                } else
+                // hit action while child is waiting -> child is picked up
+                if(status.equals(c.getString(R.string.status_waiting))) {
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
+                    child.setStatus(c.getString(R.string.status_picked_up));
+                    action.setText("Dropped Off");
+                } else
+                // hit action while child is left -> child is picked up
+                if(status.equals(c.getString(R.string.status_left))) {
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
+                    child.setStatus(c.getString(R.string.status_picked_up));
+                    action.setText("Dropped Off");
+                } else {
+                    // status doesn't fall under any known value
+                    Log.d(TAG, "Unknown status: " + status);
                 }
-                if(t.getText().equals("Dropped Off")) {
-                    helper.updateChildStatus(child.getId(), "Dropped Off");
-                    t.setText("Picked Up");
-                }
+                // Update any changes to the status to the view
+                statusView.setText(child.getStatus());
             }
         });
-        holder.red.setOnClickListener(new View.OnClickListener() {
+        alert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 ServerHelper helper = LoginActivity.getServerHelper();
-                Log.d(TAG,"Red pressed");
-                TextView t = (TextView)arg0.findViewById(R.id.blue);
-                if(t.getText().equals("Leaving")) {
-                    helper.updateChildStatus(child.getId(), "Left");
+                Context c = arg0.getContext();
+                Log.d(TAG,"Alert pressed");
+                Button t = (Button)arg0.findViewById(R.id.alert_button);
+
+                // status needs to be changed locally, impossible with final child
+                String status = child.getStatus();
+                Log.d(TAG, "Status: " + status);
+
+                // hit alert while child is waiting -> child has been left
+                if(status.equals(c.getString(R.string.status_waiting))) {
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_left));
+                    child.setStatus(c.getString(R.string.status_waiting));
+                    // t.setVisibility(GONE);
+                } else
+                // hit alert while child is en route -> child has been lost
+                if(status.equals(c.getString(R.string.status_picked_up))) {
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_lost));
+                    child.setStatus(c.getString(R.string.status_lost));
+                    t.setBackgroundColor(ContextCompat.getColor(c, R.color.green));
+                    t.setText("Found");
+                } else
+                // hit alert while child is lost -> child has been found
+                if(status.equals(c.getString(R.string.status_lost))) {
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
+                    child.setStatus(c.getString(R.string.status_picked_up));
+                    t.setBackgroundColor(ContextCompat.getColor(c, R.color.red));
                     t.setText("Lost");
+                } else {
+                    // status doesn't fall under any known value
+                    Log.d(TAG, "Unknown status: " + status);
                 }
-                arg0.findViewById(R.id.red).setVisibility(GONE);
-                arg0.findViewById(R.id.green).setVisibility(VISIBLE);
-            }
-        });
-        holder.green.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                ServerHelper helper = LoginActivity.getServerHelper();
-                Log.d(TAG,"Green pressed");
-                arg0.findViewById(R.id.green).setVisibility(GONE);
-                arg0.findViewById(R.id.red).setVisibility(VISIBLE);
-                helper.updateChildStatus(child.getId(), "Found");
+                // Update any changes to the status to the view
+                statusView.setText(child.getStatus());
             }
         });
     }

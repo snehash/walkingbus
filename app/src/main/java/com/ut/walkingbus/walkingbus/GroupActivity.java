@@ -114,8 +114,7 @@ public class GroupActivity extends AppCompatActivity
         } else if (id == R.id.nav_group) {
             this.recreate();
         } else if (id == R.id.nav_create_group) {
-            Intent intent = new Intent(this, AddGroupActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(GroupActivity.this, AddGroupActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -254,98 +253,6 @@ public class GroupActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            amAddChild.setOnClickListener(new View.OnClickListener() {
-                String groupId;
-                String timeslot;
-                ArrayList<Child> children;
-                @Override
-                public void onClick(View view) {
-                    // TODO: Retrieve which child to add
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    List<String> childNames = new ArrayList<String>();
-                    ArrayList<String> childIds = new ArrayList<String>();
-                    for(Child c: children) {
-                        childNames.add(c.getName());
-                        childIds.add(c.getId());
-                    }
-                    CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
-                    builder.setTitle("Select Child")
-                            .setItems(cs, new DialogInterface.OnClickListener() {
-                                ArrayList<String> childIds;
-                                String timeslot;
-                                String groupId;
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // The 'which' argument contains the index position
-                                    // of the selected item
-                                    String childId = childIds.get(which);
-                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
-                                }
-                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
-                                    this.groupId = groupId;
-                                    this.timeslot = timeslot;
-                                    this.childIds = new ArrayList<String>();
-                                    this.childIds.addAll(childIds);
-                                    return this;
-                                }
-
-                            }.init(groupId, timeslot, childIds));
-                }
-
-                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
-                    this.groupId = groupId;
-                    this.timeslot = timeslot;
-                    this.children = new ArrayList<Child>();
-                    this.children.addAll(children);
-                    return this;
-                }
-            }.init(groupId, timeslot + "_AM", myChildren));
-
-            pmAddChild.setOnClickListener(new View.OnClickListener() {
-                String groupId;
-                String timeslot;
-                ArrayList<Child> children;
-                @Override
-                public void onClick(View view) {
-                    // TODO: Retrieve which child to add
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    List<String> childNames = new ArrayList<String>();
-                    ArrayList<String> childIds = new ArrayList<String>();
-                    for(Child c: children) {
-                        childNames.add(c.getName());
-                        childIds.add(c.getId());
-                    }
-                    CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
-                    builder.setTitle("Select Child")
-                            .setItems(cs, new DialogInterface.OnClickListener() {
-                                ArrayList<String> childIds;
-                                String timeslot;
-                                String groupId;
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // The 'which' argument contains the index position
-                                    // of the selected item
-                                    String childId = childIds.get(which);
-                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
-                                }
-                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
-                                    this.groupId = groupId;
-                                    this.timeslot = timeslot;
-                                    this.childIds = new ArrayList<String>();
-                                    this.childIds.addAll(childIds);
-                                    return this;
-                                }
-
-                            }.init(groupId, timeslot, childIds));
-                }
-
-                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
-                    this.groupId = groupId;
-                    this.timeslot = timeslot;
-                    this.children = new ArrayList<Child>();
-                    this.children.addAll(children);
-                    return this;
-                }
-            }.init(groupId, timeslot + "_PM", myChildren));
-
             Log.d(TAG, "Section Number: " + getArguments().getInt(ARG_SECTION_NUMBER));
             Log.d(TAG, "Child Group 0: " + groupChildren.get(0).get(0).getName());
 
@@ -411,6 +318,102 @@ public class GroupActivity extends AppCompatActivity
 
             Log.d(TAG, "Group ID: " + groupId);
             Log.d(TAG, "Timeslot: " + timeslot);
+
+            amAddChild.setOnClickListener(new View.OnClickListener() {
+                String groupId;
+                String timeslot;
+                ArrayList<Child> children;
+                @Override
+                public void onClick(View view) {
+                    // TODO: Retrieve which child to add
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    List<String> childNames = new ArrayList<String>();
+                    ArrayList<String> childIds = new ArrayList<String>();
+                    for(Child c: children) {
+                        childNames.add(c.getName());
+                        childIds.add(c.getId());
+                    }
+                    Log.d(TAG, "Adding AM add child listener for: " + timeslot);
+                    CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
+                    builder.setTitle("Select Child")
+                            .setItems(cs, new DialogInterface.OnClickListener() {
+                                ArrayList<String> childIds;
+                                String timeslot;
+                                String groupId;
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+                                    String childId = childIds.get(which);
+                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
+                                }
+                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
+                                    this.groupId = groupId;
+                                    this.timeslot = timeslot;
+                                    this.childIds = new ArrayList<String>();
+                                    this.childIds.addAll(childIds);
+                                    return this;
+                                }
+
+                            }.init(groupId, timeslot, childIds));
+                    builder.create();
+                }
+
+                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
+                    this.groupId = groupId;
+                    this.timeslot = timeslot;
+                    this.children = new ArrayList<Child>();
+                    this.children.addAll(children);
+                    return this;
+                }
+            }.init(groupId, timeslot + "_AM", myChildren));
+
+            pmAddChild.setOnClickListener(new View.OnClickListener() {
+                String groupId;
+                String timeslot;
+                ArrayList<Child> children;
+                @Override
+                public void onClick(View view) {
+                    // TODO: Retrieve which child to add
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    List<String> childNames = new ArrayList<String>();
+                    ArrayList<String> childIds = new ArrayList<String>();
+                    for(Child c: children) {
+                        childNames.add(c.getName());
+                        childIds.add(c.getId());
+                    }
+                    CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
+                    builder.setTitle("Select Child")
+                            .setItems(cs, new DialogInterface.OnClickListener() {
+                                ArrayList<String> childIds;
+                                String timeslot;
+                                String groupId;
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+                                    Log.d(TAG, "Builder onclick AM");
+                                    String childId = childIds.get(which);
+                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
+                                }
+                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
+                                    this.groupId = groupId;
+                                    this.timeslot = timeslot;
+                                    this.childIds = new ArrayList<String>();
+                                    this.childIds.addAll(childIds);
+                                    return this;
+                                }
+
+                            }.init(groupId, timeslot, childIds));
+                    builder.create();
+                }
+
+                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
+                    this.groupId = groupId;
+                    this.timeslot = timeslot;
+                    this.children = new ArrayList<Child>();
+                    this.children.addAll(children);
+                    return this;
+                }
+            }.init(groupId, timeslot + "_PM", myChildren));
 
             if(amChildren.isEmpty()) {
                 Log.d(TAG, "Adding amChildren listener");
