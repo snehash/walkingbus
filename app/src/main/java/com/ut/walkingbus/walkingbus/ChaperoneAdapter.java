@@ -124,7 +124,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_dropped_off));
                     child.setStatus(c.getString(R.string.status_dropped_off));
                     // action.setVisibility(GONE);
-                    action.setText("Dropped Off");
+                    action.setText("Picked Up");
                 } else
                 // hit action while child is waiting -> child is picked up
                 if(status.equals(c.getString(R.string.status_waiting))) {
@@ -134,10 +134,22 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
                 } else
                 // hit action while child is left -> child is picked up
                 if(status.equals(c.getString(R.string.status_left))) {
+                    alert.setVisibility(VISIBLE);
+                    alert.setText("Lost");
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
                     child.setStatus(c.getString(R.string.status_picked_up));
                     action.setText("Dropped Off");
-                } else {
+                } else
+                // hit action while child is dropped off -> re-pick up child (for accidental press)
+                if(status.equals("Dropped Off")) {
+                    // allow un-dropping off
+                    helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
+                    alert.setVisibility(VISIBLE);
+                    alert.setText("Lost");
+                    child.setStatus(c.getString(R.string.status_picked_up));
+                    action.setText("Dropped Off");
+                } else
+                {
                     // status doesn't fall under any known value
                     Log.d(TAG, "Unknown status: " + status);
                 }
@@ -161,12 +173,13 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
                 if(status.equals(c.getString(R.string.status_waiting))) {
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_left));
                     child.setStatus(c.getString(R.string.status_waiting));
-                    // t.setVisibility(GONE);
+                    t.setVisibility(GONE);
                 } else
                 // hit alert while child is en route -> child has been lost
                 if(status.equals(c.getString(R.string.status_picked_up))) {
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_lost));
                     child.setStatus(c.getString(R.string.status_lost));
+                    action.setVisibility(GONE);
                     t.setBackgroundColor(ContextCompat.getColor(c, R.color.green));
                     t.setText("Found");
                 } else
@@ -174,6 +187,8 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
                 if(status.equals(c.getString(R.string.status_lost))) {
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
                     child.setStatus(c.getString(R.string.status_picked_up));
+                    action.setVisibility(VISIBLE);
+                    action.setText("Dropped Off");
                     t.setBackgroundColor(ContextCompat.getColor(c, R.color.red));
                     t.setText("Lost");
                 } else {

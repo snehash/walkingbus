@@ -196,17 +196,29 @@ public class GroupActivity extends AppCompatActivity
             }
 
             String groupId = "-1";
+            ArrayList<ArrayList<String>> groupTimeslotIds = new ArrayList<ArrayList<String>>();
 
             try {
                 JSONArray jsonGroups = data.getJSONArray("groups");
                 // just get first group for now, will use dropdown selector later
                 JSONObject jsonGroup = jsonGroups.getJSONObject(0);
+                // initialize 10 timeslots id spaces for each group
+                for(int i = 0; i < jsonGroups.length(); i++) {
+                    groupTimeslotIds.add(new ArrayList<String>());
+                    for(int j = 0; j < 10; j++) {
+                        groupTimeslotIds.get(i).add("");
+                    }
+                }
+                // TODO: Right now just using first group
+                ArrayList<String> timeslotIds = groupTimeslotIds.get(0);
+
                 groupId = jsonGroup.getString("id");
                 JSONArray jsonTimeslots = jsonGroup.getJSONArray("timeslots");
                 for(int i = 0; i < jsonTimeslots.length(); i++) {
                     JSONObject jsonTimeslot = jsonTimeslots.getJSONObject(i);
                     JSONObject jsonChaperone = jsonTimeslot.getJSONObject("chaperone");
                     String chaperoneName = jsonChaperone.getString("name");
+                    String timeslotId = jsonTimeslot.getString("id");
                     String time = jsonTimeslot.getString("time");
                     int day = getDay(time.substring(0, time.indexOf("_")));
                     int groupIndex = 0;
@@ -218,6 +230,7 @@ public class GroupActivity extends AppCompatActivity
                     groupIndex += day*2;
                     Log.d(TAG, "Children Array Index: " + groupIndex);
                     chaperoneNames.set(groupIndex, chaperoneName);
+                    timeslotIds.set(groupIndex, timeslotId);
 
                     JSONArray children = jsonTimeslot.getJSONArray("children");
                     for(int j = 0; j < children.length(); j++) {
@@ -253,9 +266,12 @@ public class GroupActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
+            int timeslotIdBaseIndex = -1;
+
             switch(getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
                     timeslot = "MONDAY";
+                    timeslotIdBaseIndex = 0;
                     if(!chaperoneNames.get(0).equals("")) {
                         amChapText.setText(chaperoneNames.get(0));
                     }
@@ -267,6 +283,7 @@ public class GroupActivity extends AppCompatActivity
                     break;
                 case 2:
                     timeslot = "TUESDAY";
+                    timeslotIdBaseIndex = 2;
                     if(!chaperoneNames.get(2).equals("")) {
                         amChapText.setText(chaperoneNames.get(2));
                     }
@@ -278,6 +295,7 @@ public class GroupActivity extends AppCompatActivity
                     break;
                 case 3:
                     timeslot = "WEDNESDAY";
+                    timeslotIdBaseIndex = 4;
                     if(!chaperoneNames.get(4).equals("")) {
                         amChapText.setText(chaperoneNames.get(4));
                     }
@@ -289,6 +307,7 @@ public class GroupActivity extends AppCompatActivity
                     break;
                 case 4:
                     timeslot = "THURSDAY";
+                    timeslotIdBaseIndex = 6;
                     if(!chaperoneNames.get(6).equals("")) {
                         amChapText.setText(chaperoneNames.get(6));
                     }
@@ -300,6 +319,7 @@ public class GroupActivity extends AppCompatActivity
                     break;
                 case 5:
                     timeslot = "FRIDAY";
+                    timeslotIdBaseIndex = 8;
                     if(!chaperoneNames.get(8).equals("")) {
                         amChapText.setText(chaperoneNames.get(8));
                     }
@@ -314,13 +334,25 @@ public class GroupActivity extends AppCompatActivity
             Log.d(TAG, "Group ID: " + groupId);
             Log.d(TAG, "Timeslot: " + timeslot);
 
+            // TODO: Populate with correct ID
+
+            // index by Mon AM, Mon PM, Tues AM, etc...
+            String amTimeslotId = groupTimeslotIds.get(0).get(timeslotIdBaseIndex);
+            String pmTimeslotId = groupTimeslotIds.get(0).get(timeslotIdBaseIndex + 1);
+
+            Log.d(TAG, "AM Timeslot ID: " + amTimeslotId);
+            Log.d(TAG, "PM Timeslot ID: " + pmTimeslotId);
+
             amAddChild.setOnClickListener(new View.OnClickListener() {
                 String groupId;
-                String timeslot;
+                String timeslotId;
                 ArrayList<Child> children;
                 @Override
                 public void onClick(View view) {
                     // TODO: Retrieve which child to add
+
+                    // Check if group exists (chaperone must have claimed it)
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     List<String> childNames = new ArrayList<String>();
                     ArrayList<String> childIds = new ArrayList<String>();
@@ -328,50 +360,59 @@ public class GroupActivity extends AppCompatActivity
                         childNames.add(c.getName());
                         childIds.add(c.getId());
                     }
-                    Log.d(TAG, "AM add child clicked for: " + timeslot);
+                    Log.d(TAG, "AM add child clicked for: " + timeslotId);
                     CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
-                    builder.setTitle("Select Child")
-                            .setItems(cs, new DialogInterface.OnClickListener() {
-                                ArrayList<String> childIds;
-                                String timeslot;
-                                String groupId;
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // The 'which' argument contains the index position
-                                    // of the selected item
-                                    String childId = childIds.get(which);
-                                    Log.d(TAG, "Add Child ID: " + childId);
-                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
-                                }
-                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
-                                    this.groupId = groupId;
-                                    this.timeslot = timeslot;
-                                    this.childIds = new ArrayList<String>();
-                                    this.childIds.addAll(childIds);
-                                    return this;
-                                }
+                    if(!timeslotId.equals("")) {
+                        builder.setTitle("Select Child")
+                                .setItems(cs, new DialogInterface.OnClickListener() {
+                                    ArrayList<String> childIds;
+                                    String timeslotId;
+                                    String groupId;
 
-                            }.init(groupId, timeslot, childIds));
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // The 'which' argument contains the index position
+                                        // of the selected item
+                                        String childId = childIds.get(which);
+                                        Log.d(TAG, "Add Child ID: " + childId);
+                                        LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslotId);
+                                    }
+
+                                    private DialogInterface.OnClickListener init(String groupId, String timeslotId, ArrayList<String> childIds) {
+                                        this.groupId = groupId;
+                                        this.timeslotId = timeslotId;
+                                        this.childIds = new ArrayList<String>();
+                                        this.childIds.addAll(childIds);
+                                        return this;
+                                    }
+
+                                }.init(groupId, timeslotId, childIds));
+                    } else {
+                        // timeslot is unclaimed
+                        builder.setTitle("Unable to Add Child");
+                        builder.setMessage("A chaperone must claim this timeslot before a child can be added.");
+                    }
                     AlertDialog addChildDialog = builder.create();
                     addChildDialog.show();
                 }
 
-                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
+                private View.OnClickListener init(String groupId, String timeslotId, ArrayList<Child> children) {
                     this.groupId = groupId;
-                    this.timeslot = timeslot;
+                    this.timeslotId = timeslotId;
                     this.children = new ArrayList<Child>();
                     this.children.addAll(children);
                     return this;
                 }
-            }.init(groupId, timeslot + "_AM", myChildren));
+            }.init(groupId, amTimeslotId, myChildren));
 
             pmAddChild.setOnClickListener(new View.OnClickListener() {
                 String groupId;
-                String timeslot;
+                String timeslotId;
                 ArrayList<Child> children;
                 @Override
                 public void onClick(View view) {
                     // TODO: Retrieve which child to add
-                    Log.d(TAG, "PM add child clicked for: " + timeslot);
+
+                    // Check if group exists (chaperone must have claimed it)
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     List<String> childNames = new ArrayList<String>();
@@ -380,42 +421,49 @@ public class GroupActivity extends AppCompatActivity
                         childNames.add(c.getName());
                         childIds.add(c.getId());
                     }
+                    Log.d(TAG, "AM add child clicked for: " + timeslotId);
                     CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
-                    builder.setTitle("Select Child")
-                            .setItems(cs, new DialogInterface.OnClickListener() {
-                                ArrayList<String> childIds;
-                                String timeslot;
-                                String groupId;
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // The 'which' argument contains the index position
-                                    // of the selected item
-                                    Log.d(TAG, "Builder onclick PM");
-                                    String childId = childIds.get(which);
-                                    Log.d(TAG, "Add Child ID: " + childId);
-                                    LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslot);
-                                }
-                                private DialogInterface.OnClickListener init(String groupId, String timeslot, ArrayList<String> childIds) {
-                                    this.groupId = groupId;
-                                    this.timeslot = timeslot;
-                                    this.childIds = new ArrayList<String>();
-                                    this.childIds.addAll(childIds);
-                                    return this;
-                                }
+                    if(!timeslotId.equals("")) {
+                        builder.setTitle("Select Child")
+                                .setItems(cs, new DialogInterface.OnClickListener() {
+                                    ArrayList<String> childIds;
+                                    String timeslotId;
+                                    String groupId;
 
-                            }.init(groupId, timeslot, childIds));
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // The 'which' argument contains the index position
+                                        // of the selected item
+                                        String childId = childIds.get(which);
+                                        Log.d(TAG, "Add Child ID: " + childId);
+                                        LoginActivity.getServerHelper().addChildToGroup(childId, groupId, timeslotId);
+                                    }
+
+                                    private DialogInterface.OnClickListener init(String groupId, String timeslotId, ArrayList<String> childIds) {
+                                        this.groupId = groupId;
+                                        this.timeslotId = timeslotId;
+                                        this.childIds = new ArrayList<String>();
+                                        this.childIds.addAll(childIds);
+                                        return this;
+                                    }
+
+                                }.init(groupId, timeslotId, childIds));
+                    } else {
+                        // timeslot is unclaimed
+                        builder.setTitle("Unable to Add Child");
+                        builder.setMessage("A chaperone must claim this timeslot before a child can be added.");
+                    }
                     AlertDialog addChildDialog = builder.create();
                     addChildDialog.show();
-
                 }
 
                 private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> children) {
                     this.groupId = groupId;
-                    this.timeslot = timeslot;
+                    this.timeslotId = timeslot;
                     this.children = new ArrayList<Child>();
                     this.children.addAll(children);
                     return this;
                 }
-            }.init(groupId, timeslot + "_PM", myChildren));
+            }.init(groupId, pmTimeslotId, myChildren));
 
             Log.d(TAG, "amChaptext: " + amChapText.getText());
             Log.d(TAG, "pmChaptext: " + pmChapText.getText());
