@@ -173,9 +173,9 @@ public class GroupActivity extends AppCompatActivity
             RecyclerView pm = (RecyclerView) rootView.findViewById(R.id.pm_group);
 
             View amChaperone =  rootView.findViewById(R.id.am_chaperone);
-            View pmChaperone =  rootView.findViewById(R.id.am_chaperone);
-            TextView pmChapText = (TextView) amChaperone.findViewById(R.id.name);
-            TextView amChapText = (TextView) pmChaperone.findViewById(R.id.name);
+            View pmChaperone =  rootView.findViewById(R.id.pm_chaperone);
+            TextView amChapText = (TextView) amChaperone.findViewById(R.id.name);
+            TextView pmChapText = (TextView) pmChaperone.findViewById(R.id.name);
 
             am.setHasFixedSize(true);
             pm.setHasFixedSize(true);
@@ -253,11 +253,6 @@ public class GroupActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            Log.d(TAG, "Section Number: " + getArguments().getInt(ARG_SECTION_NUMBER));
-            Log.d(TAG, "Child Group 0: " + groupChildren.get(0).get(0).getName());
-
-            // groupChildren.get(8).add(new Child("Placeholder", null, null, null, null, null));
-
             switch(getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
                     timeslot = "MONDAY";
@@ -333,7 +328,7 @@ public class GroupActivity extends AppCompatActivity
                         childNames.add(c.getName());
                         childIds.add(c.getId());
                     }
-                    Log.d(TAG, "Adding AM add child listener for: " + timeslot);
+                    Log.d(TAG, "AM add child clicked for: " + timeslot);
                     CharSequence[] cs = childNames.toArray(new CharSequence[childNames.size()]);
                     builder.setTitle("Select Child")
                             .setItems(cs, new DialogInterface.OnClickListener() {
@@ -374,6 +369,8 @@ public class GroupActivity extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     // TODO: Retrieve which child to add
+                    Log.d(TAG, "PM add child clicked for: " + timeslot);
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     List<String> childNames = new ArrayList<String>();
                     ArrayList<String> childIds = new ArrayList<String>();
@@ -415,8 +412,11 @@ public class GroupActivity extends AppCompatActivity
                 }
             }.init(groupId, timeslot + "_PM", myChildren));
 
-            if(amChildren.isEmpty()) {
-                Log.d(TAG, "Adding amChildren listener");
+            Log.d(TAG, "amChaptext: " + amChapText.getText());
+            Log.d(TAG, "pmChaptext: " + pmChapText.getText());
+
+            if(!amChapText.getText().equals("Tap to claim")) {
+                Log.d(TAG, "Adding amChaperone listener");
                 // no AM chaperone
                 amChapText.setOnClickListener(new View.OnClickListener() {
                     String groupId;
@@ -434,7 +434,8 @@ public class GroupActivity extends AppCompatActivity
                 }.init(groupId, timeslot + "_AM"));
 
             }
-            if(pmChildren.isEmpty()) {
+            if(!pmChapText.getText().equals("Tap to claim")) {
+                Log.d(TAG, "Adding pmChaperone listener");
                 // no PM chaperone
                 pmChapText.setOnClickListener(new View.OnClickListener() {
                     String groupId;
