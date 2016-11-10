@@ -36,7 +36,9 @@
         <activity
             android:name=".GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AddGroupActivity"></activity>
+        <activity
+            android:name=".AddGroupActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
