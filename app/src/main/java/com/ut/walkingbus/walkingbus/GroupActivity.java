@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,7 +24,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -46,12 +50,15 @@ public class GroupActivity extends AppCompatActivity
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    // TODO: clean up use of static dropdown selector
+    private static String groupId = "-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +101,43 @@ public class GroupActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.actionbar_settings, menu);
+        getMenuInflater().inflate(R.menu.menu_group, menu);
+        MenuItem spinnerHolder = menu.findItem(R.id.spinner);
+        Spinner groupSpinner = (Spinner) MenuItemCompat.getActionView(spinnerHolder);
+        String contents[] = {};
+        ArrayList<String> groupIds = new ArrayList<>();
+
+        try {
+            JSONObject data = LoginActivity.getServerHelper().getParentData();
+            JSONArray jsonGroups = data.getJSONArray("groups");
+            for(int i = 0; i < jsonGroups.length(); i++) {
+                String id = jsonGroups.getJSONObject(i).getString("id");
+                groupIds.add(id);
+                if(i == 0)
+                    groupId = id;
+            }
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+        ArrayAdapter<String> groupAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, groupIds);
+
+        Log.d(TAG, "GroupAdapter count: " + groupAdapter.getCount());
+
+        groupSpinner.setAdapter(groupAdapter);
+
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                groupId = (String)adapterView.getItemAtPosition(i);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         return true;
     }
 
@@ -200,10 +243,19 @@ public class GroupActivity extends AppCompatActivity
 
             try {
                 JSONArray jsonGroups = data.getJSONArray("groups");
+
                 // just get first group for now, will use dropdown selector later
-                JSONObject jsonGroup = jsonGroups.getJSONObject(0);
+                JSONObject jsonGroup = new JSONObject();
                 // initialize 10 timeslots id spaces for each group
+
+                Log.d(TAG, "GroupActivity groupId: " + GroupActivity.groupId);
+
                 for(int i = 0; i < jsonGroups.length(); i++) {
+                    JSONObject g = jsonGroups.getJSONObject(i);
+                    if(g.getString("id").equals(GroupActivity.groupId)) {
+                        Log.d(TAG, "ID matches");
+                        jsonGroup = g;
+                    }
                     groupTimeslotIds.add(new ArrayList<String>());
                     for(int j = 0; j < 10; j++) {
                         groupTimeslotIds.get(i).add("");
@@ -468,7 +520,7 @@ public class GroupActivity extends AppCompatActivity
             Log.d(TAG, "amChaptext: " + amChapText.getText());
             Log.d(TAG, "pmChaptext: " + pmChapText.getText());
 
-            if(!amChapText.getText().equals("Tap to claim")) {
+            if(amChapText.getText().equals("Tap to claim")) {
                 Log.d(TAG, "Adding amChaperone listener");
                 // no AM chaperone
                 amChapText.setOnClickListener(new View.OnClickListener() {
@@ -476,6 +528,7 @@ public class GroupActivity extends AppCompatActivity
                     String timeslot;
                     @Override
                     public void onClick(View view) {
+                        Log.d(TAG, "Chaperone is claiming AM");
                         LoginActivity.getServerHelper().addChaperone(groupId, timeslot);
                     }
 
@@ -487,7 +540,7 @@ public class GroupActivity extends AppCompatActivity
                 }.init(groupId, timeslot + "_AM"));
 
             }
-            if(!pmChapText.getText().equals("Tap to claim")) {
+            if(pmChapText.getText().equals("Tap to claim")) {
                 Log.d(TAG, "Adding pmChaperone listener");
                 // no PM chaperone
                 pmChapText.setOnClickListener(new View.OnClickListener() {
@@ -495,6 +548,7 @@ public class GroupActivity extends AppCompatActivity
                     String timeslot;
                     @Override
                     public void onClick(View view) {
+                        Log.d(TAG, "Chaperone is claiming PM");
                         LoginActivity.getServerHelper().addChaperone(groupId, timeslot);
                     }
 
