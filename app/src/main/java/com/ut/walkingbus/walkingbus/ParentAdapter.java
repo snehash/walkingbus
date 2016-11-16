@@ -67,7 +67,8 @@ public class ParentAdapter extends RecyclerView.Adapter<ParentAdapter.MyViewHold
         String status = child.getStatus();
         Log.d(TAG, "Status: " + status);
 
-        if(status.equals(mContext.getString(R.string.status_picked_up))) {
+        if(status.equals(mContext.getString(R.string.status_picked_up)) ||
+                status.equals(mContext.getString(R.string.status_lost))) {
 
             holder.message.setVisibility(VISIBLE);
             holder.call.setVisibility(VISIBLE);

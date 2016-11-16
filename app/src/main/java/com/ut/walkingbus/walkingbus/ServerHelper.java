@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -372,7 +371,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
                 httpPost.setHeader("Authentication", idToken);
                 params.add(new BasicNameValuePair("name", name));
                 // Start new children with waiting status
-                params.add(new BasicNameValuePair("status", Resources.getSystem().getString(R.string.status_waiting)));
+                params.add(new BasicNameValuePair("status", "Waiting"));
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
                 HttpResponse response = httpClient.execute(httpPost);
                 final String responseBody = EntityUtils.toString(response.getEntity());
