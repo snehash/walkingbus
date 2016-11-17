@@ -156,7 +156,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new Register().execute(result.getSignInAccount().getIdToken());
+                    new Register().execute(result.getSignInAccount().getId());
                 }
             }
         });
@@ -167,7 +167,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new GetInformationTask().execute(result.getSignInAccount().getIdToken());
+                    new GetInformationTask().execute(result.getSignInAccount().getId());
                 }
             }
         });
@@ -182,7 +182,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new AddChildTask().execute(result.getSignInAccount().getIdToken(), childName);
+                    new AddChildTask().execute(result.getSignInAccount().getId(), childName);
                 }
             }
             private ResultCallback<GoogleSignInResult> init(String childName) {
@@ -197,7 +197,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new AddGroupTask().execute(result.getSignInAccount().getIdToken());
+                    new AddGroupTask().execute(result.getSignInAccount().getId());
                 }
             }
         });
@@ -211,7 +211,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new AddChaperoneTask().execute(result.getSignInAccount().getIdToken(), groupId, timeslot);
+                    new AddChaperoneTask().execute(result.getSignInAccount().getId(), groupId, timeslot);
                 }
             }
             private ResultCallback<GoogleSignInResult> init(String groupId, String timeslot) {
@@ -229,7 +229,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new UpdateChildStatusTask().execute(result.getSignInAccount().getIdToken(), childId, childStatus);
+                    new UpdateChildStatusTask().execute(result.getSignInAccount().getId(), childId, childStatus);
                 }
             }
             private ResultCallback<GoogleSignInResult> init(String childId, String childStatus) {
@@ -249,7 +249,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
                     Log.d(TAG, "Adding child " + childId + " to group " + groupId + " for timeslot " + timeslotId);
-                    new AddChildToGroupTask().execute(result.getSignInAccount().getIdToken(), childId, groupId, timeslotId);
+                    new AddChildToGroupTask().execute(result.getSignInAccount().getId(), childId, groupId, timeslotId);
                 }
             }
             private ResultCallback<GoogleSignInResult> init(String childId, String groupId, String timeslotId) {
