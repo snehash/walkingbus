@@ -89,12 +89,16 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
             alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
             action.setBackgroundColor(ContextCompat.getColor(mContext, R.color.blue));
 
-            action.setText("Picked Up");
-            alert.setText("Leaving");
+            action.setText("Dropped Off");
+            alert.setText("Lost");
         } else
         if(childStatus.equals(mContext.getString(R.string.status_dropped_off))) {
-            action.setVisibility(GONE);
+            action.setVisibility(VISIBLE);
             alert.setVisibility(GONE);
+
+            action.setBackgroundColor(ContextCompat.getColor(mContext, R.color.blue));
+
+            action.setText("Picked Up");
         } else
         if(childStatus.equals(mContext.getString(R.string.status_left))) {
             action.setVisibility(VISIBLE);
@@ -125,16 +129,21 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
                     child.setStatus(c.getString(R.string.status_dropped_off));
                     // action.setVisibility(GONE);
                     action.setText("Picked Up");
+                    alert.setVisibility(GONE);
                 } else
                 // hit action while child is waiting -> child is picked up
                 if(status.equals(c.getString(R.string.status_waiting))) {
+                    alert.setVisibility(VISIBLE);
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
                     child.setStatus(c.getString(R.string.status_picked_up));
                     action.setText("Dropped Off");
+                    alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+                    alert.setText("Lost");
                 } else
                 // hit action while child is left -> child is picked up
                 if(status.equals(c.getString(R.string.status_left))) {
                     alert.setVisibility(VISIBLE);
+                    alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
                     alert.setText("Lost");
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
                     child.setStatus(c.getString(R.string.status_picked_up));
@@ -146,6 +155,7 @@ public class ChaperoneAdapter extends RecyclerView.Adapter<ChaperoneAdapter.MyVi
                     helper.updateChildStatus(child.getId(), c.getString(R.string.status_picked_up));
                     alert.setVisibility(VISIBLE);
                     alert.setText("Lost");
+                    alert.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
                     child.setStatus(c.getString(R.string.status_picked_up));
                     action.setText("Dropped Off");
                 } else

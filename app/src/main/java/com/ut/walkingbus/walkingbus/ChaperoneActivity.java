@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -110,7 +113,39 @@ public class ChaperoneActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.actionbar_settings, menu);
+        getMenuInflater().inflate(R.menu.menu_chaperone, menu);
+        MenuItem daySpinnerHolder = menu.findItem(R.id.chaperone_day_spinner);
+        MenuItem groupSpinnerHolder = menu.findItem(R.id.chaperone_group_spinner);
+        Spinner daySpinner = (Spinner) MenuItemCompat.getActionView(daySpinnerHolder);
+        Spinner groupSpinner = (Spinner) MenuItemCompat.getActionView(groupSpinnerHolder);
+
+        String contents[] = {};
+        ArrayList<String> groupIds = new ArrayList<>();
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Monday");
+        days.add("Tuesday");
+        days.add("Wednesday");
+        days.add("Thursday");
+        days.add("Friday");
+
+        try {
+            JSONObject data = LoginActivity.getServerHelper().getParentData();
+            JSONArray jsonGroups = data.getJSONArray("groups");
+            for(int i = 0; i < jsonGroups.length(); i++) {
+                String id = jsonGroups.getJSONObject(i).getString("id");
+                groupIds.add(id);
+            }
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        ArrayAdapter<String> groupAdapter = new ArrayAdapter<String>(this, R.layout.spinner_dropdown_item, groupIds);
+        ArrayAdapter<String> dayAdapter = new ArrayAdapter<String>(this, R.layout.spinner_dropdown_item, days);
+
+        groupSpinner.setAdapter(groupAdapter);
+        daySpinner.setAdapter(dayAdapter);
+        daySpinner.setSelection(3);
+
         return true;
     }
 
