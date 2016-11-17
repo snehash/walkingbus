@@ -30,6 +30,8 @@ public class AddChildActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setTitle("Add Child");
+
         Button buttonLoadImage = (Button) findViewById(R.id.add_picture_button);
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
 

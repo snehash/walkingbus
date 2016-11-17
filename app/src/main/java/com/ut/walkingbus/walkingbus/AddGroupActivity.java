@@ -20,6 +20,7 @@ public class AddGroupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_group);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle("Create Group");
 
         Button submit = (Button) findViewById(R.id.add_submit);
         submit.setOnClickListener(new View.OnClickListener() {

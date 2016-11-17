@@ -60,6 +60,7 @@ public class ChaperoneActivity extends AppCompatActivity
         setContentView(R.layout.activity_chaperone);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle("Chaperone");
 
         mServerHelper = LoginActivity.getServerHelper();
         mServerHelper.setContext(this);
