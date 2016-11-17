@@ -15,7 +15,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 
 import org.apache.http.HttpResponse;
@@ -44,7 +43,6 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
     private static final String TAG = "ServerHelper";
 
     private GoogleApiClient mGoogleApiClient;
-    private GoogleSignInOptions gso;
     private Context mContext;
     private String mId;
     private boolean needToRegister;
@@ -56,7 +54,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
 
     public ServerHelper(Context context) {
         mContext = context;
-        gso = new GoogleSignInOptions.Builder(
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(SERVER_CLIENT_ID)
                 .requestProfile()
@@ -89,13 +87,11 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
         return needToRegister;
     }
 
-    public Scope[] requestInitialSignIn() {
+    public void requestInitialSignIn() {
 
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         ((Activity)mContext).startActivityForResult(signInIntent, LoginActivity.RC_GET_AUTH_CODE);
 
-
-        return gso.getScopeArray();
     }
 
     public boolean isSignInDone() {
