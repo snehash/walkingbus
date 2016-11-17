@@ -20,6 +20,15 @@ public class Child {
         mChaperoneName = chaperoneName;
     }
 
+    public Child (Child c) {
+        mId = c.getId();
+        mName = c.getName();
+        mPicture = c.getPicture();
+        mStatus = c.getStatus();
+        mChaperoneNumber = c.getChaperoneNumber();
+        mChaperoneName = c.getChaperoneName();
+    }
+
     public void setId(String id) {mId = id;}
 
     public void setName(String name) {
