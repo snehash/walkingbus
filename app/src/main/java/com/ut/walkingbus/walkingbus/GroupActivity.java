@@ -86,6 +86,22 @@ public class GroupActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        LoginActivity.getServerHelper().setContext(this);
+        JSONObject data = LoginActivity.getServerHelper().getParentData();
+        String email = "";
+        String username = "";
+
+        try {
+            email = data.getString("email");
+            username = data.getString("name");
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        View header = navigationView.getHeaderView(0);
+        ((TextView)header.findViewById(R.id.nav_username)).setText(username);
+        ((TextView)header.findViewById(R.id.nav_email)).setText(email);
     }
 
     @Override

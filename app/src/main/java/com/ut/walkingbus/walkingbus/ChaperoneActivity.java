@@ -21,8 +21,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -78,6 +80,21 @@ public class ChaperoneActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        LoginActivity.getServerHelper().setContext(this);
+        JSONObject data = LoginActivity.getServerHelper().getParentData();
+        String email = "";
+        String username = "";
+
+        try {
+            email = data.getString("email");
+            username = data.getString("name");
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        View header = navigationView.getHeaderView(0);
+        ((TextView)header.findViewById(R.id.nav_username)).setText(username);
+        ((TextView)header.findViewById(R.id.nav_email)).setText(email);
     }
 
     @Override

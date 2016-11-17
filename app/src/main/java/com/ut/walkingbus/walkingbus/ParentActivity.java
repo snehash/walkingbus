@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,9 +55,13 @@ public class ParentActivity extends AppCompatActivity
         }
 
         JSONObject data = mServerHelper.getParentData();
+        String username = "";
+        String email = "";
 
         ArrayList<Child> children = new ArrayList<Child>();
         try {
+            username = data.getString("name");
+            email = data.getString("email");
             JSONArray jsonChildren = data.getJSONArray("children");
             for(int i = 0; i < jsonChildren.length(); i++) {
                 JSONObject jsonChild = jsonChildren.getJSONObject(i);
@@ -88,6 +93,10 @@ public class ParentActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View header = navigationView.getHeaderView(0);
+        ((TextView)header.findViewById(R.id.nav_username)).setText(username);
+        ((TextView)header.findViewById(R.id.nav_email)).setText(email);
 
         //server stuff
         // mServerHelper = LoginActivity.getServerHelper();
