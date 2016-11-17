@@ -145,7 +145,10 @@ public class GroupActivity extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 groupId = (String)adapterView.getItemAtPosition(i);
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+                int prev = mViewPager.getCurrentItem();
+                mViewPager.setAdapter(mSectionsPagerAdapter);
+                mViewPager.setCurrentItem(prev);
             }
 
             @Override
@@ -207,6 +210,8 @@ public class GroupActivity extends AppCompatActivity
         private static final String ARG_SECTION_NUMBER = "section_number";
         private GroupAdapter amChildAdapter;
         private GroupAdapter pmChildAdapter;
+        private final ArrayList<Child> amChildren = new ArrayList<Child>();
+        private final ArrayList<Child> pmChildren = new ArrayList<Child>();
 
         public PlaceholderFragment() {
         }
@@ -320,9 +325,6 @@ public class GroupActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            ArrayList<Child> amChildren = new ArrayList<Child>();
-            ArrayList<Child> pmChildren = new ArrayList<Child>();
-
             String timeslot = "";
 
             Button amAddChild = (Button) rootView.findViewById(R.id.am_add_child);
@@ -353,8 +355,10 @@ public class GroupActivity extends AppCompatActivity
                     if(!chaperoneNames.get(1).equals("")) {
                         pmChapText.setText(chaperoneNames.get(1));
                     }
-                    amChildren = groupChildren.get(0);
-                    pmChildren = groupChildren.get(1);
+                    amChildren.clear();
+                    pmChildren.clear();
+                    amChildren.addAll(groupChildren.get(0));
+                    pmChildren.addAll(groupChildren.get(1));
                     break;
                 case 2:
                     timeslot = "TUESDAY";
@@ -365,8 +369,10 @@ public class GroupActivity extends AppCompatActivity
                     if(!chaperoneNames.get(3).equals("")) {
                         pmChapText.setText(chaperoneNames.get(3));
                     }
-                    amChildren = groupChildren.get(2);
-                    pmChildren = groupChildren.get(3);
+                    amChildren.clear();
+                    pmChildren.clear();
+                    amChildren.addAll(groupChildren.get(2));
+                    pmChildren.addAll(groupChildren.get(3));
                     break;
                 case 3:
                     timeslot = "WEDNESDAY";
@@ -377,8 +383,10 @@ public class GroupActivity extends AppCompatActivity
                     if(!chaperoneNames.get(5).equals("")) {
                         pmChapText.setText(chaperoneNames.get(5));
                     }
-                    amChildren = groupChildren.get(4);
-                    pmChildren = groupChildren.get(5);
+                    amChildren.clear();
+                    pmChildren.clear();
+                    amChildren.addAll(groupChildren.get(4));
+                    pmChildren.addAll(groupChildren.get(5));
                     break;
                 case 4:
                     timeslot = "THURSDAY";
@@ -389,8 +397,10 @@ public class GroupActivity extends AppCompatActivity
                     if(!chaperoneNames.get(7).equals("")) {
                         pmChapText.setText(chaperoneNames.get(7));
                     }
-                    amChildren = groupChildren.get(6);
-                    pmChildren = groupChildren.get(7);
+                    amChildren.clear();
+                    pmChildren.clear();
+                    amChildren.addAll(groupChildren.get(6));
+                    pmChildren.addAll(groupChildren.get(7));
                     break;
                 case 5:
                     timeslot = "FRIDAY";
@@ -401,8 +411,10 @@ public class GroupActivity extends AppCompatActivity
                     if(!chaperoneNames.get(9).equals("")) {
                         pmChapText.setText(chaperoneNames.get(9));
                     }
-                    amChildren = groupChildren.get(8);
-                    pmChildren = groupChildren.get(9);
+                    amChildren.clear();
+                    pmChildren.clear();
+                    amChildren.addAll(groupChildren.get(8));
+                    pmChildren.addAll(groupChildren.get(9));
                     break;
             }
 
@@ -421,7 +433,6 @@ public class GroupActivity extends AppCompatActivity
             amAddChild.setOnClickListener(new View.OnClickListener() {
                 String groupId;
                 String timeslotId;
-                ArrayList<Child> children;
                 ArrayList<Child> myChildren;
                 @Override
                 public void onClick(View view) {
@@ -442,7 +453,6 @@ public class GroupActivity extends AppCompatActivity
                         builder.setTitle("Select Child")
                                 .setItems(cs, new DialogInterface.OnClickListener() {
                                     ArrayList<Child> myChildren;
-                                    ArrayList<Child> children;
                                     String timeslotId;
                                     String groupId;
                                     View view;
@@ -453,26 +463,24 @@ public class GroupActivity extends AppCompatActivity
                                         Child child = myChildren.get(which);
                                         Log.d(TAG, "Add Child ID: " + child.getId());
                                         LoginActivity.getServerHelper().addChildToGroup(child.getId(), groupId, timeslotId);
-                                        children.add(new Child(child));
-                                        Log.d(TAG, children.get(0).getName());
-                                        amChildAdapter = new GroupAdapter(children, view.getContext());
+                                        amChildren.add(new Child(child));
+                                        Log.d(TAG, amChildren.get(0).getName());
+                                        amChildAdapter = new GroupAdapter(amChildren, view.getContext());
                                         amChildAdapter.notifyDataSetChanged();
                                         am.setAdapter(amChildAdapter);
                                         mSectionsPagerAdapter.notifyDataSetChanged();
                                     }
 
-                                    private DialogInterface.OnClickListener init(String groupId, String timeslotId, ArrayList<Child> myChildren, ArrayList<Child> children, View view) {
+                                    private DialogInterface.OnClickListener init(String groupId, String timeslotId, ArrayList<Child> myChildren, View view) {
                                         this.groupId = groupId;
                                         this.timeslotId = timeslotId;
                                         this.myChildren = new ArrayList<Child>();
                                         this.myChildren.addAll(myChildren);
-                                        this.children = new ArrayList<Child>();
-                                        this.children.addAll(children);
                                         this.view = view;
                                         return this;
                                     }
 
-                                }.init(groupId, timeslotId, myChildren, children, view));
+                                }.init(groupId, timeslotId, myChildren, view));
                     } else {
                         // timeslot is unclaimed
                         builder.setTitle("Unable to Add Child");
@@ -482,22 +490,19 @@ public class GroupActivity extends AppCompatActivity
                     addChildDialog.show();
                 }
 
-                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> myChildren, ArrayList<Child> children) {
+                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> myChildren) {
                     this.groupId = groupId;
                     this.timeslotId = timeslot;
                     this.myChildren = new ArrayList<Child>();
                     this.myChildren.addAll(myChildren);
-                    this.children = new ArrayList<Child>();
-                    this.children.addAll(children);
                     return this;
                 }
-            }.init(groupId, amTimeslotId, myChildren, amChildren));
+            }.init(groupId, amTimeslotId, myChildren));
 
             pmAddChild.setOnClickListener(new View.OnClickListener() {
                 String groupId;
                 String timeslotId;
                 ArrayList<Child> myChildren;
-                ArrayList<Child> children;
                 @Override
                 public void onClick(View view) {
                     // TODO: Retrieve which child to add
@@ -517,7 +522,6 @@ public class GroupActivity extends AppCompatActivity
                         builder.setTitle("Select Child")
                                 .setItems(cs, new DialogInterface.OnClickListener() {
                                     ArrayList<Child> myChildren;
-                                    ArrayList<Child> children;
                                     String timeslotId;
                                     String groupId;
                                     View view;
@@ -528,25 +532,23 @@ public class GroupActivity extends AppCompatActivity
                                         Child child = myChildren.get(which);
                                         Log.d(TAG, "Add Child ID: " + child.getId());
                                         LoginActivity.getServerHelper().addChildToGroup(child.getId(), groupId, timeslotId);
-                                        children.add(new Child(child));
-                                        pmChildAdapter = new GroupAdapter(children, view.getContext());
+                                        pmChildren.add(new Child(child));
+                                        pmChildAdapter = new GroupAdapter(pmChildren, view.getContext());
                                         pmChildAdapter.notifyDataSetChanged();
                                         pm.setAdapter(pmChildAdapter);
                                         mSectionsPagerAdapter.notifyDataSetChanged();
                                     }
 
-                                    private DialogInterface.OnClickListener init(String groupId, String timeslotId, ArrayList<Child> myChildren, ArrayList<Child> children, View view) {
+                                    private DialogInterface.OnClickListener init(String groupId, String timeslotId, ArrayList<Child> myChildren, View view) {
                                         this.groupId = groupId;
                                         this.timeslotId = timeslotId;
                                         this.myChildren = new ArrayList<Child>();
                                         this.myChildren.addAll(myChildren);
-                                        this.children = new ArrayList<Child>();
-                                        this.children.addAll(children);
                                         this.view = view;
                                         return this;
                                     }
 
-                                }.init(groupId, timeslotId, myChildren, children, view));
+                                }.init(groupId, timeslotId, myChildren, view));
                     } else {
                         // timeslot is unclaimed
                         builder.setTitle("Unable to Add Child");
@@ -556,16 +558,14 @@ public class GroupActivity extends AppCompatActivity
                     addChildDialog.show();
                 }
 
-                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> myChildren, ArrayList<Child> children) {
+                private View.OnClickListener init(String groupId, String timeslot, ArrayList<Child> myChildren) {
                     this.groupId = groupId;
                     this.timeslotId = timeslot;
                     this.myChildren = new ArrayList<Child>();
                     this.myChildren.addAll(myChildren);
-                    this.children = new ArrayList<Child>();
-                    this.children.addAll(children);
                     return this;
                 }
-            }.init(groupId, pmTimeslotId, myChildren, pmChildren));
+            }.init(groupId, pmTimeslotId, myChildren));
 
             Log.d(TAG, "amChaptext: " + amChapText.getText());
             Log.d(TAG, "pmChaptext: " + pmChapText.getText());
