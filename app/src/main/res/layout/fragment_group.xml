@@ -17,6 +17,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="10pt"
                 android:text="AM"/>
 
             <include layout="@layout/group_chaperone"
@@ -29,14 +30,30 @@
                 android:layout_marginBottom="5dp" />
 
             <Button
+                android:id="@+id/am_add_child"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/am_add_child"
-                android:text="Add Child" />
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/blue"
+                android:textColor="@android:color/white"
+                android:layout_weight="1"
+                android:visibility="visible"
+                android:text="Add Child"/>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_marginTop="5dp"
+                android:background="@android:color/darker_gray" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="10pt"
                 android:text="PM"/>
 
             <include layout="@layout/group_chaperone"
@@ -48,10 +65,19 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                android:id="@+id/pm_add_child"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/pm_add_child"
-                android:text="Add Child" />
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/blue"
+                android:textColor="@android:color/white"
+                android:layout_weight="1"
+                android:visibility="visible"
+                android:text="Add Child"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
