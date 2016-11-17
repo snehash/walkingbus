@@ -167,12 +167,14 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             @Override
             public void onResult(GoogleSignInResult result) {
                 if (result.isSuccess()) {
-                    new GetInformationTask().execute(result.getSignInAccount().getId());
+                    try {
+                        new GetInformationTask().execute(result.getSignInAccount().getId()).get();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
-        while(!dataRetrieved) {}
-        dataRetrieved = false;
         return parentData;
     }
 
