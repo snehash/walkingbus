@@ -126,6 +126,46 @@ public class ParentActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "Resuming");
+        mServerHelper = LoginActivity.getServerHelper();
+        mServerHelper.setContext(this);
+
+        //get the id
+        if(mServerHelper.getNeedToRegister()) {
+            mServerHelper.register();
+        }
+
+        JSONObject data = mServerHelper.getParentData();
+
+        ArrayList<Child> children = new ArrayList<Child>();
+        try {
+            JSONArray jsonChildren = data.getJSONArray("children");
+            for(int i = 0; i < jsonChildren.length(); i++) {
+                JSONObject jsonChild = jsonChildren.getJSONObject(i);
+                String id = jsonChild.getString("id");
+                String name = jsonChild.getString("name");
+                String status = jsonChild.getString("status");
+                children.add(new Child(id, name, null, status, null, null));
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, "children should be added");
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.childList);
+        mRecyclerView.setLayoutManager(llm);
+        mChildAdapter = new ParentAdapter(children, this);
+
+        mRecyclerView.setAdapter(mChildAdapter);
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {

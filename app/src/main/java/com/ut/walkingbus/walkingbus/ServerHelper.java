@@ -172,6 +172,7 @@ public class ServerHelper implements GoogleApiClient.OnConnectionFailedListener{
             }
         });
         while(!dataRetrieved) {}
+        dataRetrieved = false;
         return parentData;
     }
 
