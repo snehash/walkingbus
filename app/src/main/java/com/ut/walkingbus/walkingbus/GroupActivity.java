@@ -119,7 +119,7 @@ public class GroupActivity extends AppCompatActivity
         } catch(JSONException e) {
             e.printStackTrace();
         }
-        ArrayAdapter<String> groupAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, groupIds);
+        ArrayAdapter<String> groupAdapter = new ArrayAdapter<String>(this, R.layout.spinner_dropdown_item, groupIds);
 
         Log.d(TAG, "GroupAdapter count: " + groupAdapter.getCount());
 
